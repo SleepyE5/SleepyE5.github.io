@@ -279,9 +279,9 @@ html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
             </div>
           </div>
           <div class="plates">
-            <figure class="plate"><img src="assets/02-exploration.png" alt="Fablerift exploration" loading="lazy"><figcaption>exploration · pinewood vale</figcaption></figure>
-            <figure class="plate"><img src="assets/03-combat.png" alt="Fablerift combat" loading="lazy"><figcaption>combat, before the numbers moved</figcaption></figure>
-            <figure class="plate"><img src="assets/11-phone.png" alt="Fablerift phone UI" loading="lazy"><figcaption>the in-game phone. yes, really</figcaption></figure>
+            <figure class="plate"><picture><source type="image/webp" srcset="assets/02-exploration.webp"><img src="assets/02-exploration.png" alt="Fablerift exploration" width="1100" height="899" loading="lazy"></picture><figcaption>exploration · pinewood vale</figcaption></figure>
+            <figure class="plate"><picture><source type="image/webp" srcset="assets/03-combat.webp"><img src="assets/03-combat.png" alt="Fablerift combat" width="1100" height="899" loading="lazy"></picture><figcaption>combat, before the numbers moved</figcaption></figure>
+            <figure class="plate"><picture><source type="image/webp" srcset="assets/11-phone.webp"><img src="assets/11-phone.png" alt="Fablerift phone UI" width="1100" height="2380" loading="lazy"></picture><figcaption>the in-game phone. yes, really</figcaption></figure>
           </div>
         </div>
         <div class="entry" style="margin-top:18px">
@@ -477,7 +477,7 @@ pr-guard: tests 68 · pass 68 · fail 0</div>
       <div>
         <dl class="facts">
           <dt>daily</dt><dd>C#, .NET 9 and 10</dd>
-          <dt>open source</dt><dd>five repos, no dependencies, CI on each</dd>
+          <dt>open source</dt><dd>five repos, four with zero dependencies, CI on each</dd>
           <dt>engine</dt><dd>Unity</dd>
           <dt>shaders</dt><dd>ShaderLab / URP</dd>
           <dt>editor</dt><dd>Rider</dd>
@@ -532,7 +532,9 @@ let at = 0;
 function show(i) {
   at = (i + shots.length) % shots.length;
   const im = shots[at];
-  big.src = im.src; big.alt = im.alt;
+  /* currentSrc, not src: the picture element may have picked the webp, and
+     that is the one already sitting in the cache */
+  big.src = im.currentSrc || im.src; big.alt = im.alt;
   capEl.textContent = im.closest('.plate').querySelector('figcaption').textContent;
   nEl.textContent = (at + 1) + ' / ' + shots.length;
 }
