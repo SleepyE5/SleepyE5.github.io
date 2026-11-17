@@ -137,6 +137,19 @@ section{padding:64px 0 12px}
 /* real output from the tools, quieter than a plate */
 .clip{border-left:2px solid var(--oxide);background:var(--bg2);padding:14px 16px;
   font:11px/1.75 var(--mono);color:var(--fg2);white-space:pre-wrap}
+/* tool output is fixed-width text: let it keep its columns and scroll rather than
+   fold "nothing at that path" under the destination it belongs to */
+.tools .clip{white-space:pre;overflow-x:auto;padding-bottom:10px;margin-top:24px}
+.tools .clip .h{white-space:normal}
+/* a pre block reports a huge min-content width, and a grid item will not shrink
+   below its content unless told to -- which is how one line of terminal output
+   pushed the whole page sideways on a phone */
+.row>div,.body>div{min-width:0}
+@media(max-width:780px){.tools .clip{white-space:pre-wrap;font-size:10.5px}}
+/* The output block is taken out of the print column and given the full measure
+   below it: a real terminal line is 69 characters, which is wider than any
+   column this layout can offer beside prose, and truncating or wrapping tool
+   output is how a quote stops looking like evidence. */
 .clip .h{display:block;font:600 10px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;
   color:var(--oxide);margin-bottom:10px}
 .clip .bad{color:var(--bad)}
@@ -193,8 +206,9 @@ html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
 <div class="topbar" id="topbar"><div class="wrap tb-in">
   <span class="tb-name">Enrico Sgiarovello</span>
   <nav class="tb-nav" aria-label="sections">
-    <a href="#01">01 Fablerift</a><a href="#02">02 Roomsmith</a>
-    <a href="#03">03 Parser lab</a><a href="#small">Smaller things</a>
+    <a href="#01">01 Fablerift</a><a href="#02">02 linkcheck</a>
+    <a href="#03">03 tinysite</a><a href="#04">04 three more</a>
+    <a href="#small">Smaller things</a>
   </nav>
   <a class="tb-play" href="https://play.fablerift.net/">play fablerift</a>
 </div></div>
@@ -205,7 +219,7 @@ html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
     <h1><b>Enrico</b> Sgiarovello</h1>
     <div class="line">
       <span class="job">solo developer · c# / .net · unity</span>
-      <span class="upd mono">updated 17 nov 2026</span>
+      <span class="upd mono">updated 18 nov 2026</span>
     </div>
     <div class="mast-body">
       <p class="pitch">I write the server, the clients, the launcher and the installer, then put a
@@ -214,8 +228,9 @@ html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
       <nav class="index" aria-label="contents">
         <span class="h">contents</span>
         <a href="#01"><span class="n">01</span>Fablerift</a>
-        <a href="#02"><span class="n">02</span>Roomsmith</a>
-        <a href="#03"><span class="n">03</span>Parser lab</a>
+        <a href="#02"><span class="n">02</span>linkcheck</a>
+        <a href="#03"><span class="n">03</span>tinysite</a>
+        <a href="#04"><span class="n">04</span>three more</a>
         <a href="#small"><span class="n">—</span>smaller things</a>
       </nav>
     </div>
@@ -277,61 +292,167 @@ html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
         <p class="meta" style="margin-top:14px">source repo is still private while the game is live — the release page, the update feed and the server list are not. ask and I will walk you through the code.</p>
       </div>
     </div>
-    <div class="row reveal" id="02">
+    <div class="row tools reveal" id="02">
       <div class="num">02</div>
       <div>
-        <h3><b>Roomsmith</b> — level graph editor that exports my server's coordinates</h3>
-        <p class="meta">browser tool · vanilla js · <i>no install, no account</i></p>
+        <h3><b>linkcheck</b> — finds Markdown links that go nowhere, before a reader does</h3>
+        <p class="meta">node 20+ · zero dependencies · MIT<br><i>12 commits · 86 tests · CI on three node versions</i></p>
         <div class="body">
           <div>
-            <p>Level design coursework taught me the boring half: a map that only exists in a text file
-              is a map nobody can check. Roomsmith is a grid editor where you drop rooms, wire exits and
-              watch the graph light up — and it exports the same coordinate shape Fablerift's server sends
-              to a client's mapper, so a room lands on the side its direction names instead of being
-              guessed from text.</p>
-            <p>It also catches the mistakes that cost a weekend to find in a real server: an exit that points at a room that is not there, two rooms landing on one square, an orphaned pocket nobody can walk into, and a loop whose arithmetic disagrees. Run east from Threshold to Stormglass, then claim north from Stormglass reaches Threshold, and it says so before you ship the map — four rooms wired north, east, south, west close fine and it stays quiet about them.</p>
+            <p>Every project here has a README, and READMEs rot: a file gets renamed, a heading gets
+              retitled, an image moves, and the link stays behind looking fine in the editor. This
+              resolves the links in a tree against the filesystem — paths, root-relative paths,
+              <span class="mono">#anchors</span> into other files, reference definitions, raw
+              <span class="mono">&lt;img&gt;</span> tags — and reports the ones that miss.</p>
+            <p>The hard part is not detection, it is restraint. A link inside a fenced code block is
+              documentation of a syntax, not a promise that the file exists. A bare
+              <span class="mono">[sic]</span> in prose is not a broken reference. A dead definition in a
+              README footer is one mistake, not one per mention. <span class="mono">mailto:</span> is not
+              a file. Every one of those rules exists because the alternative is a checker that produces
+              errors nobody can fix, and people switch those off.</p>
+            <p>External URLs are only asked about when you pass <span class="mono">--external</span>, and
+              even then only <span class="mono">404</span>, <span class="mono">410</span> and
+              <span class="mono">451</span> are called broken. A 403 or a rate limit is reported as
+              <i>unreachable</i> and counted in its own sentence, because a link checker that cries wolf
+              about live sites gets deleted from the workflow within a week.</p>
           </div>
           <div class="plates">
-            <figure class="plate"><img src="roomsmith/shot.png" alt="Roomsmith editor" loading="lazy"><figcaption>roomsmith · the square closes, the lighthouse does not</figcaption></figure>
-            <div class="clip"><span class="h">on the map above</span><span class="bad">✕ Lighthouse is reachable only from itself — nothing leads here from Threshold</span>
-<span class="h" style="margin-top:10px">on a loop that cannot close</span><span class="bad">✕ loop does not close: Threshold sits at 0,0 but Stormglass puts it at 1,-1 via north</span></div>
+            <div class="aside">
+              <span class="h">the bug that mattered</span>
+              Installed from the tarball it ran silently and exited 0, because the entry-point check
+              compared a symlink path lexically — a broken install looked like a clean bill of health,
+              which is the worst thing a tool whose entire job is telling you something can do. Found by
+              installing it, which no test did. There is a test now.
+            </div>
           </div>
         </div>
+        <div class="clip"><span class="h">a real run, real output</span>README.md
+     4  missing-file    docs/CHANGELOG.md  nothing at that path
+     5  missing-file    assets/banner.png  nothing at that path
+     6  missing-anchor  docs/guide.md#instal  no heading of that name
+    14  missing-file    docs/old-report.md  nothing at that path
+
+4 problems in 1 file  ·  checked 2 files, 13 links<span class="h" style="margin-top:10px">what it stayed quiet about</span>[the spec](https://example.com/spec)   not asked, no --external
+[shortcut in prose]                    rendered as text by GitHub
+![logo](data:image/png;base64,AAA)     inline, not a file
+`[guide](docs/guide.md)`               inside a fence, so not a promise</div>
         <div class="entry" style="margin-top:18px">
-          <a href="roomsmith/">open roomsmith →</a>
-          <a href="https://github.com/SleepyE5/SleepyE5.github.io/blob/main/roomsmith/index.html">source</a>
+          <a href="https://github.com/SleepyE5/linkcheck">github.com/SleepyE5/linkcheck →</a>
+          <a href="https://github.com/SleepyE5/linkcheck/blob/main/README.md">what it refuses to report</a>
         </div>
       </div>
     </div>
 
-    <div class="row reveal" id="03">
+    <div class="row tools reveal" id="03">
       <div class="num">03</div>
       <div>
-        <h3><b>Parser playground</b> — the command grammar, isolated</h3>
-        <p class="meta">js · the same shape as the C# parser · <i>type into it</i></p>
+        <h3><b>tinysite</b> — a static site generator small enough to read end to end</h3>
+        <p class="meta">c# · net10.0 global tool · MIT<br><i>12 commits · 283 tests · no packages at all</i></p>
         <div class="body">
           <div>
-            <p>People ask how a MUD understands <span class="mono">get lamp</span> or
-              <span class="mono">give it to mia</span>. This is the interesting part pulled out of
-              the server and rewritten small: synonyms, ambiguity resolution, multi-object lists,
-              implicit <span class="mono">it</span>, and the message you get when two things could
-              match. Every response comes from the parser in the page, not from a script, so you
-              can say something absurd and watch it fail honestly.</p>
+            <p>Markdown plus one HTML template in; a site with pages, an archive, tag pages and an RSS
+              feed out. The Markdown converter is hand-written — 820 lines, no dependencies — which is
+              most of the reason the project exists: I wanted to know exactly what happens to a fenced
+              code block that contains a closing fence.</p>
+            <p>A file named <span class="mono">2026-01-01-hello.md</span> is a post, so it joins the
+              archive and the feed; without the date prefix it is a page. One layout with
+              <span class="mono">{{placeholders}}</span> covers the rest, and a placeholder is
+              HTML-escaped unless the builder registered it as raw, so an author's
+              <span class="mono">&lt;script&gt;</span> in a title arrives as text in the
+              <span class="mono">&lt;head&gt;</span> while the converted body keeps its
+              <span class="mono">&lt;strong&gt;</span>.</p>
+            <p>Builds are byte-reproducible: sorted enumeration, LF newlines, UTF-8 without BOM, and no
+              <span class="mono">lastBuildDate</span> in the feed, because a value taken from the clock
+              makes every build differ and turns every diff into a lie about content. A test builds the
+              same source twice, sleeps a second between runs, and compares every byte.</p>
           </div>
           <div class="plates">
-            <figure class="plate"><img src="parser/shot.png" alt="Parser playground" loading="lazy"><figcaption>parser · ambiguity, on purpose</figcaption></figure>
-            <div class="clip"><span class="h">an exchange, unscripted</span><span class="you">&gt; take the lantern</span>
-Which one — the rusty lantern or the brass lantern?
-<span class="you">&gt; rusty</span>
-You take the rusty lantern.
-<span class="you">&gt; give it to mia</span>
-You give the rusty lantern to Mia.
-Mia takes it, looks at it, and puts it out of sight.</div>
+            <div class="aside">
+              <span class="h">what it does not do</span>
+              No front-matter schema beyond a handful of keys, no templating logic, no pagination, no
+              image pipeline, no dev server. And the CI does not stop at the unit tests: it packs the
+              tool, installs it as a global tool, scaffolds a tree and publishes it, because a green
+              suite would not notice broken <span class="mono">bin</span> wiring.
+            </div>
           </div>
         </div>
+        <div class="clip"><span class="h">the installed tool, a real build</span>$ tinysite build --source . --output _site \
+    --base-url https://sleepye5.github.io/demo
+tinysite: 2 documents (1 dated), 9 files -> _site in 42 ms
+  .tinysite
+  about/index.html
+  archive/index.html
+  feed.xml
+  index.html
+  posts/hello/index.html
+  style.css
+  tags/first/index.html
+  tags/index.html<span class="h" style="margin-top:10px">a source that cannot be read publishes nothing</span>$ tinysite build --source . --output _site
+tinysite: one.md: line 1: expected 'key: value' but found 'key without a colon'.
+tinysite: two.md: line 1: 'date' must be an ISO date such as 2026-03-01 or
+              2026-03-01T14:30:00Z but was 'not a date'.
+tinysite: 2 problems in the source; nothing was published.</div>
         <div class="entry" style="margin-top:18px">
-          <a href="parser/">try the parser →</a>
-          <a href="https://github.com/SleepyE5/SleepyE5.github.io/blob/main/parser/index.html">source</a>
+          <a href="https://github.com/SleepyE5/tinysite">github.com/SleepyE5/tinysite →</a>
+          <a href="https://github.com/SleepyE5/tinysite/blob/main/README.md">decisions worth knowing about</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row tools reveal" id="04">
+      <div class="num">04</div>
+      <div>
+        <h3><b>Three more</b>, written for a problem I had</h3>
+        <p class="meta">same rules as above: tests that run in CI, and a README that says what is not true</p>
+        <div class="body">
+          <div>
+            <ul class="notes">
+              <li><a href="https://github.com/SleepyE5/uptime"><b>uptime</b></a> — an uptime monitor that
+                lives entirely in one repository: a <span class="mono">targets.yml</span>, a cron
+                workflow, and state committed back as JSON, so <span class="mono">git log</span> on that
+                file is the uptime history. When a target goes down it opens its own GitHub issue. It
+                comments on a cadence rather than every five minutes, because an outage that repeats
+                itself a hundred times overnight is an outage you will have muted by morning — and it
+                speaks immediately when the failure <i>changes</i>. 18 commits, 109 tests, and the three
+                targets it is pointed at are this site, its own HTTP-to-HTTPS upgrade, and GitHub's
+                status API.</li>
+              <li><a href="https://github.com/SleepyE5/pr-guard"><b>pr-guard</b></a> — a GitHub Action
+                with three checkable rules: source changed with no test changed, a file over the line
+                budget, a commit called <span class="mono">fixed stuff</span>. It does not pretend to
+                judge whether your tests are any good, and says so in the README. Bundled to a single
+                <span class="mono">dist/index.js</span> so consuming it needs no install; its own
+                dependencies are the official Actions toolkit and <span class="mono">minimatch</span>,
+                nothing more. 15 commits, 68 tests, and it reviews its own pull requests.</li>
+              <li><a href="https://github.com/SleepyE5/slidelimit"><b>slidelimit</b></a> — sliding-window
+                and token-bucket rate limiting behind one interface, with pluggable storage and every
+                clock read going through an injected <span class="mono">TimeProvider</span>, which is
+                what makes the boundary cases testable to the tick instead of <i>sleep and hope</i>.
+                14 commits, 49 tests, concurrency storms of 256 gated threads, and measured benchmarks
+                rather than claimed ones.</li>
+            </ul>
+          </div>
+          <div class="plates">
+            <div class="aside">
+              <span class="h">how the histories were made</span>
+              Each repository was built in small commits as the work happened — parser, then resolver,
+              then the file walker, then the command line — with tests landing next to the code they
+              cover. Nothing is backdated and no commit pretends to be older than it is; you can check
+              the author dates against the order the files appear in.
+            </div>
+          </div>
+        </div>
+        <div class="clip"><span class="h">uptime, three real targets</span>$ node bin/uptime.js run --dry-run
+uptime: portfolio: UP
+uptime: http-upgrade: UP
+uptime: github-status: UP
+uptime: done: 3 up, 0 down, 0 issue(s) opened (0 adopted), 0 comment(s), 0 issue(s) closed<span class="h" style="margin-top:10px">slidelimit, the whole suite</span>Passed!  - Failed: 0, Passed: 49, Skipped: 0, Total: 49
+Time Elapsed 00:00:00.448
+
+pr-guard: tests 68 · pass 68 · fail 0</div>
+        <div class="entry" style="margin-top:18px">
+          <a href="https://github.com/SleepyE5/uptime">uptime →</a>
+          <a href="https://github.com/SleepyE5/pr-guard">pr-guard →</a>
+          <a href="https://github.com/SleepyE5/slidelimit">slidelimit →</a>
         </div>
       </div>
     </div>
@@ -355,7 +476,8 @@ Mia takes it, looks at it, and puts it out of sight.</div>
       </div>
       <div>
         <dl class="facts">
-          <dt>daily</dt><dd>C#, .NET 9</dd>
+          <dt>daily</dt><dd>C#, .NET 9 and 10</dd>
+          <dt>open source</dt><dd>five repos, no dependencies, CI on each</dd>
           <dt>engine</dt><dd>Unity</dd>
           <dt>shaders</dt><dd>ShaderLab / URP</dd>
           <dt>editor</dt><dd>Rider</dd>
