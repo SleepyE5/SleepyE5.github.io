@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0f1113">
 <title>Enrico Sgiarovello</title>
 <meta name="description" content="Enrico Sgiarovello — solo developer. Ships Fablerift, a MUD in C# on .NET 9 that runs in the browser, plus small games and tools.">
 <link rel="icon" href="favicon.png">
@@ -13,7 +15,7 @@
    operate, mono for anything that is a fact or a machine's own output. */
 :root{
   --bg:#0f1113; --bg2:#15181b; --bg3:#1b1f23;
-  --fg:#e8e6e1; --fg2:#b4b1aa; --fg3:#7d8288;
+  --fg:#e8e6e1; --fg2:#b4b1aa; --fg3:#8f959b;
   --line:#282d33; --line2:#3b4249;
   --brass:#d9a441; --oxide:#63a58c; --bad:#d9614c;
   --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
@@ -26,10 +28,22 @@
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--fg);
   font:var(--s0)/1.62 var(--serif);-webkit-font-smoothing:antialiased}
-/* a dot grid rather than paper fibre: same idea, reads engineered instead of craft */
+/* without this, scrollbars, the textarea and text selection all come through
+   in the browser's light theme on a near-black page */
+:root{color-scheme:dark}
+::selection{background:rgba(217,164,65,.28);color:#fff}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px;border-radius:1px}
+/* a dot grid rather than paper fibre, fading out so it never competes with
+   text, and two washes of light behind the masthead so the page sits in a
+   room instead of on a flat slab */
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1px);
-  background-size:26px 26px}
+  background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:26px 26px;
+  -webkit-mask-image:linear-gradient(#000 0%,rgba(0,0,0,.35) 46%,transparent 82%);
+  mask-image:linear-gradient(#000 0%,rgba(0,0,0,.35) 46%,transparent 82%)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(780px 430px at 20% -10%,rgba(217,164,65,.10),transparent 70%),
+             radial-gradient(640px 400px at 86% 2%,rgba(99,165,140,.055),transparent 72%)}
 .wrap{max-width:960px;margin:0 auto;padding:0 26px;position:relative;z-index:1}
 .mono{font-family:var(--mono)}
 a{color:var(--fg);text-decoration:none;border-bottom:1px solid var(--line2)}
@@ -70,6 +84,13 @@ h2{font:600 11px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;
 .mast .index a:hover{color:var(--brass)}
 .mast .index .n{font-family:var(--mono);color:var(--fg3);margin-right:8px}
 @media(max-width:780px){.mast-body{grid-template-columns:1fr;gap:26px}.mast{padding-top:56px}}
+.rail{display:flex;flex-wrap:wrap;gap:0;margin:34px 0 0;padding-top:2px;
+  border-top:1px solid var(--line)}
+.rail div{padding:16px 26px 0 0;margin-right:26px;border-right:1px solid var(--line)}
+.rail div:last-child{border-right:0;margin-right:0}
+.rail dt{font:400 22px/1 var(--mono);font-variant-numeric:tabular-nums;color:var(--brass)}
+.rail dd{margin:7px 0 0;font:11px/1.4 var(--sans);letter-spacing:.03em;color:var(--ink3)}
+@media(max-width:620px){.rail div{border-right:0;padding-right:0;margin-right:30px}}
 .entry{margin:26px 0 0;display:flex;gap:10px;flex-wrap:wrap;font:600 12px/1 var(--sans);letter-spacing:.04em}
 .entry a{padding:9px 14px;border:1px solid var(--line2);background:var(--bg2);color:var(--fg2)}
 .entry a:hover{background:var(--brass);color:#14161a;border-color:var(--brass)}
@@ -77,7 +98,15 @@ h2{font:600 11px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;
 /* numbered index rows */
 section{padding:64px 0 12px}
 .row{display:grid;grid-template-columns:56px 1fr;gap:0 24px;padding:38px 0;border-bottom:1px solid var(--line);
-  scroll-margin-top:74px}
+  scroll-margin-top:74px;position:relative}
+.row .num{transition:color .35s ease}
+.row.cur .num{color:var(--brass)}
+@media(min-width:900px){
+  .row::before{content:"";position:absolute;left:-15px;top:44px;bottom:44px;width:2px;
+    background:var(--brass);opacity:0;transform:scaleY(.2);transform-origin:top;
+    transition:opacity .35s ease,transform .45s ease}
+  .row.cur::before{opacity:1;transform:scaleY(1)}
+}
 .row:last-child{border-bottom:0}
 .num{font:12px/2.1 var(--mono);color:var(--fg3)}
 .row h3{font-size:var(--s3);margin:0;font-weight:400;letter-spacing:-.015em;
@@ -92,7 +121,14 @@ section{padding:64px 0 12px}
 @media(max-width:780px){.body{grid-template-columns:1fr;gap:26px}.row{grid-template-columns:34px 1fr}}
 
 /* matted prints: a dark mount and a hairline, no tape, no tilt, no shadow */
-.plate{margin:0 0 20px;background:var(--bg2);padding:11px 11px 12px;border:1px solid var(--line)}
+.plate{margin:0 0 20px;background:var(--bg2);padding:11px 11px 12px;border:1px solid var(--line);
+  position:relative;transition:border-color .2s ease}
+.plate:hover{border-color:var(--rule2)}
+.plate img:hover{border-color:var(--brass)}
+.plate::after{content:"click to enlarge";position:absolute;right:11px;bottom:12px;
+  font:10px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--brass);
+  opacity:0;transition:opacity .2s ease}
+.plate:hover::after{opacity:1}
 .plate img{display:block;width:100%;height:auto;max-height:320px;object-fit:contain;
   cursor:zoom-in;border:1px solid var(--line2);background:var(--bg3)}
 .plate figcaption{margin:11px 2px 1px;font:11px/1.45 var(--sans);letter-spacing:.03em;color:var(--fg3)}
@@ -107,7 +143,8 @@ section{padding:64px 0 12px}
 .clip .you{color:var(--fg)}
 
 /* plain lists, not cards */
-dl.facts{margin:0;font:12px/1.9 var(--mono);display:grid;grid-template-columns:auto 1fr}
+dl.facts{margin:0;font:12px/1.9 var(--mono);font-variant-numeric:tabular-nums;
+  display:grid;grid-template-columns:auto 1fr}
 dl.facts dt{color:var(--fg3);padding-right:18px;white-space:nowrap}
 dl.facts dd{margin:0;color:var(--fg2)}
 ul.notes{margin:0;padding-left:0;list-style:none}
@@ -124,16 +161,26 @@ footer{margin-top:56px;padding:34px 0 72px;border-top:1px solid var(--line);
 footer a{color:var(--fg2);border-bottom-color:var(--line2)}
 footer p{margin:0;max-width:80ch}
 
-#lightbox{position:fixed;inset:0;background:rgba(8,9,11,.96);display:none;place-items:center;
-  z-index:30;padding:24px;cursor:zoom-out}
+#lightbox{position:fixed;inset:0;background:rgba(8,9,11,.97);display:none;
+  grid-template-rows:1fr auto;justify-items:center;align-content:center;gap:14px;
+  z-index:30;padding:26px;cursor:zoom-out}
 #lightbox.on{display:grid}
-#lightbox img{max-width:100%;max-height:86vh;background:var(--bg2);padding:10px;border:1px solid var(--line2)}
+#lightbox img{max-width:100%;max-height:80vh;background:var(--bg2);padding:10px;
+  border:1px solid var(--line2);cursor:default}
+.lb-bar{display:flex;gap:18px;align-items:baseline;font:12px/1.4 var(--sans);color:var(--ink2)}
+#lb-n{font-size:11px;color:var(--ink3);letter-spacing:.08em}
+@media(max-width:620px){.lb-bar{flex-direction:column;gap:4px;align-items:center}}
 
 /* content arrives instead of being already there; never at the expense of
    anyone who asked for no motion */
 .reveal{opacity:1;transform:none}
 html.js .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
 html.js .reveal.in{opacity:1;transform:none}
+html.js .plates .plate{opacity:0;transform:translateY(14px);
+  transition:opacity .5s ease,transform .5s ease}
+html.js .reveal.in .plates .plate{opacity:1;transform:none}
+html.js .reveal.in .plates .plate:nth-child(2){transition-delay:.1s}
+html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   html.js .reveal{opacity:1;transform:none;transition:none}
@@ -172,6 +219,12 @@ html.js .reveal.in{opacity:1;transform:none}
         <a href="#small"><span class="n">—</span>smaller things</a>
       </nav>
     </div>
+    <dl class="rail">
+      <div><dt>v1.5.1</dt><dd>released 15 nov 2026</dd></div>
+      <div><dt>441</dt><dd>commits, all mine</dd></div>
+      <div><dt>243</dt><dd>hand-written rooms</dd></div>
+      <div><dt>10</dt><dd>regions to walk</dd></div>
+    </dl>
     <div class="entry">
       <a href="https://play.fablerift.net/">play fablerift →</a>
       <a href="#01">what I built</a>
@@ -342,15 +395,34 @@ Mia takes it, looks at it, and puts it out of sight.</div>
 
 </div>
 
-<div id="lightbox"><img alt="" src=""></div>
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="screenshot">
+  <img alt="" src="">
+  <div class="lb-bar"><span id="lb-cap"></span><span id="lb-n" class="mono"></span></div>
+</div>
 
 <script>
+/* the lightbox holds every plate on the page, so the arrow keys walk the
+   set instead of forcing you back out to click the next one */
 const box = document.getElementById('lightbox'), big = box.querySelector('img');
-document.querySelectorAll('.plate img').forEach(im => im.addEventListener('click', () => {
-  big.src = im.src; big.alt = im.alt; box.classList.add('on');
-}));
-box.addEventListener('click', () => box.classList.remove('on'));
-addEventListener('keydown', e => { if (e.key === 'Escape') box.classList.remove('on'); });
+const shots = [...document.querySelectorAll('.plate img')];
+const capEl = document.getElementById('lb-cap'), nEl = document.getElementById('lb-n');
+let at = 0;
+function show(i) {
+  at = (i + shots.length) % shots.length;
+  const im = shots[at];
+  big.src = im.src; big.alt = im.alt;
+  capEl.textContent = im.closest('.plate').querySelector('figcaption').textContent;
+  nEl.textContent = (at + 1) + ' / ' + shots.length;
+}
+function open(i) { show(i); box.classList.add('on'); }
+shots.forEach((im, i) => im.addEventListener('click', () => open(i)));
+box.addEventListener('click', e => { if (e.target !== big) box.classList.remove('on'); });
+addEventListener('keydown', e => {
+  if (!box.classList.contains('on')) return;
+  if (e.key === 'Escape') box.classList.remove('on');
+  if (e.key === 'ArrowRight') show(at + 1);
+  if (e.key === 'ArrowLeft') show(at - 1);
+});
 
 /* Rows arrive once they are in view. If IntersectionObserver is missing, or the
    user asked for no motion, everything is simply visible from the start. */
@@ -372,7 +444,9 @@ const links = {}; document.querySelectorAll('.tb-nav a').forEach(a => links[a.ha
 const spy = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
   Object.values(links).forEach(a => a.classList.remove('cur'));
+  document.querySelectorAll('.row').forEach(r => r.classList.remove('cur'));
   const a = links[e.target.id]; if (a) a.classList.add('cur');
+  if (e.target.classList.contains('row')) e.target.classList.add('cur');
 }), {rootMargin: '-45% 0px -50% 0px'});
 document.querySelectorAll('.row[id], section#small').forEach(r => spy.observe(r));
 </script>

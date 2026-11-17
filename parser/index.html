@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0f1113">
 <title>Parser lab — the command grammar, isolated</title>
 <link rel="icon" href="../favicon.png">
 <meta name="description" content="Synonyms, ambiguity, multi-object lists and implicit it, taken out of a MUD server and rewritten small enough to read. Type anything; the replies come from the parser, not from a script.">
@@ -10,12 +12,15 @@
 /* same three faces as the homepage: serif to read, sans to operate, mono for
    anything that is a fact or the machine's own output */
 :root{--paper:#0f1113;--panel:#15181b;--raise:#1b1f23;--ink:#e8e6e1;--ink2:#b4b1aa;
-  --ink3:#7d8288;--rule:#282d33;--rule2:#3b4249;--brass:#d9a441;--oxide:#63a58c;--bad:#d9614c;
+  --ink3:#8f959b;--rule:#282d33;--rule2:#3b4249;--brass:#d9a441;--oxide:#63a58c;--bad:#d9614c;
   --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
   --sans:ui-sans-serif,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Georgia,'Times New Roman',serif}
+:root{color-scheme:dark}
+::selection{background:rgba(217,164,65,.28);color:#fff}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1px);
   background-size:26px 26px}
