@@ -36,7 +36,18 @@ h2{font:11px/1 ui-monospace,Menlo,monospace;letter-spacing:.2em;text-transform:u
 .mast .line{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin-top:18px}
 .mast .job{font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--oxide);letter-spacing:.06em}
 .mast .upd{font:11px/1.4 ui-monospace,Menlo,monospace;color:var(--ink3);margin-left:auto}
-.pitch{font-size:20px;line-height:1.55;max-width:60ch;margin:26px 0 0;color:var(--ink2)}
+/* ch is measured on a digit, which is wider than running text, so 60ch here was
+   still 84 characters a line. Measured the rendered text: Georgia at 19px runs
+   about 8px a character, so 28em lands near 67. */
+.pitch{font-size:19px;line-height:1.6;max-width:28em;margin:0;color:var(--ink2)}
+.mast-body{display:grid;grid-template-columns:1fr 196px;gap:34px;align-items:start;margin:26px 0 0}
+.mast .index{display:grid;gap:7px;font:12px/1.4 ui-monospace,Menlo,monospace;
+  border-left:1px solid var(--rule);padding-left:16px}
+.mast .index .h{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mast .index a{border-bottom:0;color:var(--ink2);display:block}
+.mast .index a:hover{color:var(--brass)}
+.mast .index .n{color:var(--ink3);margin-right:7px}
+@media(max-width:780px){.mast-body{grid-template-columns:1fr;gap:22px}}
 .pitch em{font-style:italic;color:var(--ink)}
 .entry{margin:22px 0 0;display:flex;gap:10px;flex-wrap:wrap;font:13px/1 ui-monospace,Menlo,monospace}
 .entry a{padding:7px 11px;border:1px solid var(--ink);background:var(--paper2)}
@@ -47,39 +58,53 @@ section{padding:46px 0 8px}
 .row{display:grid;grid-template-columns:52px 1fr;gap:0 22px;padding:26px 0;border-bottom:1px solid var(--rule)}
 .row:last-child{border-bottom:0}
 .num{font:12px/1.9 ui-monospace,Menlo,monospace;color:var(--ink3)}
-.row h3{font-size:26px;margin:0;font-weight:400;letter-spacing:-.01em}
+.row h3{font-size:clamp(21px,2.4vw,26px);margin:0;font-weight:400;letter-spacing:-.01em;
+  max-width:44ch;text-wrap:balance}
 .row h3 b{font-weight:700}
-.meta{font:12px/1.5 ui-monospace,Menlo,monospace;color:var(--ink3);margin:7px 0 12px}
+.meta{font:12px/1.5 ui-monospace,Menlo,monospace;color:var(--ink3);margin:7px 0 12px;
+  max-width:62ch;text-wrap:pretty}
 .meta i{font-style:normal;color:var(--oxide)}
-.row p{margin:0 0 12px;max-width:62ch}
+.row p{margin:0 0 12px;max-width:62ch;text-wrap:pretty}
+.row .mono{font-size:.84em}
 .row p:last-child{margin-bottom:0}
 .body{display:grid;grid-template-columns:1.28fr .72fr;gap:30px;align-items:start}
 @media(max-width:780px){.body{grid-template-columns:1fr;gap:22px}.row{grid-template-columns:34px 1fr}}
 
 /* taped screenshots */
-.plate{margin:0 0 16px;position:relative;background:#fff;padding:9px 9px 30px;
+.plate{margin:0 0 16px;position:relative;background:#fff;padding:9px 9px 40px;
   border:1px solid var(--rule);box-shadow:0 12px 26px rgba(40,34,20,.14);transform:rotate(-.7deg)}
 .plate:nth-child(even){transform:rotate(.9deg)}
 .plate::before{content:"";position:absolute;top:-11px;left:26px;width:74px;height:20px;
   background:var(--tape);opacity:.85;transform:rotate(-2.4deg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.plate img{display:block;width:100%;height:auto;cursor:zoom-in}
-.plate figcaption{position:absolute;left:11px;right:11px;bottom:8px;
-  font:11px/1.3 ui-monospace,Menlo,monospace;color:var(--ink3)}
+.plate img{display:block;width:100%;height:auto;max-height:320px;object-fit:contain;
+  cursor:zoom-in;border:1px solid var(--rule)}
+.plate figcaption{position:absolute;left:11px;right:11px;bottom:11px;
+  font:11px/1.35 ui-monospace,Menlo,monospace;color:var(--ink3)}
 .plates{display:grid;gap:20px}
+
+/* real output from the tools, set quieter than a plate */
+.clip{border-left:3px solid var(--oxide);background:var(--paper2);padding:12px 14px;
+  font:11px/1.7 ui-monospace,Menlo,monospace;color:var(--ink2);white-space:pre-wrap}
+.clip .h{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--oxide);margin-bottom:8px}
+.clip .bad{color:#8a3527}
+.clip .you{color:var(--ink)}
 
 /* plain lists, not cards */
 dl.facts{margin:0;font:13px/1.9 ui-monospace,Menlo,monospace;display:grid;grid-template-columns:auto 1fr}
 dl.facts dt{color:var(--ink3);padding-right:16px;white-space:nowrap}
 dl.facts dd{margin:0;color:var(--ink2)}
-ul.notes{margin:0;padding-left:20px}
-ul.notes li{margin:0 0 9px}
-ul.notes li::marker{color:var(--brass)}
+ul.notes{margin:0;padding-left:0;list-style:none}
+ul.notes li{margin:0 0 11px;padding-left:19px;position:relative}
+ul.notes li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;
+  background:var(--brass);opacity:.8}
 .aside{background:var(--paper2);border-left:3px solid var(--brass);padding:16px 18px;font-size:15px;color:var(--ink2)}
 .aside .h{font:11px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;
   color:var(--brass);display:block;margin-bottom:9px}
 footer{margin-top:40px;padding:30px 0 60px;border-top:3px double var(--rule);
   font:12px/1.9 ui-monospace,Menlo,monospace;color:var(--ink3)}
 footer a{color:var(--ink2)}
+footer p{margin:0;max-width:88ch}
 #lightbox{position:fixed;inset:0;background:rgba(28,26,22,.94);display:none;place-items:center;z-index:30;padding:24px;cursor:zoom-out}
 #lightbox.on{display:grid}
 #lightbox img{max-width:100%;max-height:86vh;background:#fff;padding:10px}
@@ -96,9 +121,18 @@ footer a{color:var(--ink2)}
       <span class="job">solo developer · c# / .net · unity</span>
       <span class="upd mono">updated 17 nov 2026</span>
     </div>
-    <p class="pitch">I write the server, the clients, the launcher and the installer, then put a
-      download page at the end of it. <em>Fablerift</em> is the proof: a MUD you can start playing in
-      about a minute, in a browser, on the same world the Telnet players are standing in.</p>
+    <div class="mast-body">
+      <p class="pitch">I write the server, the clients, the launcher and the installer, then put a
+        download page at the end of it. <em>Fablerift</em> is the proof: a MUD you can start playing in
+        about a minute, in a browser, on the same world the Telnet players are standing in.</p>
+      <nav class="index" aria-label="contents">
+        <span class="h">contents</span>
+        <a href="#01"><span class="n">01</span>Fablerift</a>
+        <a href="#02"><span class="n">02</span>Roomsmith</a>
+        <a href="#03"><span class="n">03</span>Parser lab</a>
+        <a href="#small"><span class="n">—</span>smaller things</a>
+      </nav>
+    </div>
     <div class="entry">
       <a href="https://play.fablerift.net/">play fablerift →</a>
       <a href="#01">what I built</a>
@@ -114,7 +148,7 @@ footer a{color:var(--ink2)}
       <div class="num">01</div>
       <div>
         <h3><b>Fablerift</b> — text RPG, browser + Telnet + SSH</h3>
-        <p class="meta">C# · net9.0 · MIT · <i>v1.5.1, 15 nov 2026</i> · 441 commits, all mine</p>
+        <p class="meta">C# · net9.0 · MIT<br><i>v1.5.1, released 15 nov 2026</i> · 441 commits, all mine</p>
         <div class="body">
           <div>
             <p>A MUD, written from the socket up. Players type commands and walk a world that ten of
@@ -163,12 +197,12 @@ footer a{color:var(--ink2)}
               watch the graph light up — and it exports the same coordinate shape Fablerift's server sends
               to a client's mapper, so a room lands on the side its direction names instead of being
               guessed from text.</p>
-            <p>It also catches the mistakes that are expensive later: exits that point at nothing, rooms
-              two players would walk through in opposite directions, orphaned pockets, two rooms sharing
-              a square.</p>
+            <p>It also catches the mistakes that cost a weekend to find in a real server: an exit that points at a room that is not there, two rooms landing on one square, an orphaned pocket nobody can walk into, and a loop whose arithmetic disagrees. Run east from Threshold to Stormglass, then claim north from Stormglass reaches Threshold, and it says so before you ship the map — four rooms wired north, east, south, west close fine and it stays quiet about them.</p>
           </div>
           <div class="plates">
-            <figure class="plate"><img src="roomsmith/shot.png" alt="Roomsmith editor" loading="lazy"><figcaption>roomsmith · a closed square, a cellar, one bad exit</figcaption></figure>
+            <figure class="plate"><img src="roomsmith/shot.png" alt="Roomsmith editor" loading="lazy"><figcaption>roomsmith · the square closes, the lighthouse does not</figcaption></figure>
+            <div class="clip"><span class="h">on the map above</span><span class="bad">✕ Lighthouse is reachable only from itself — nothing leads here from Threshold</span>
+<span class="h" style="margin-top:10px">on a loop that cannot close</span><span class="bad">✕ loop does not close: Threshold sits at 0,0 but Stormglass puts it at 1,-1 via north</span></div>
           </div>
         </div>
         <div class="entry" style="margin-top:18px">
@@ -185,14 +219,22 @@ footer a{color:var(--ink2)}
         <p class="meta">js · the same shape as the C# parser · <i>type into it</i></p>
         <div class="body">
           <div>
-            <p>People ask how a MUD understands <span class="mono">give the rusty lantern to mia</span>.
-              This is the interesting part pulled out of the server and rewritten small: synonyms,
-              ambiguity resolution, multi-object lists, implicit it, and the messages you get when two
-              things could match. Every response is generated by the parser in the page, not by a script,
-              so you can say something absurd and watch it fail honestly.</p>
+            <p>People ask how a MUD understands <span class="mono">get lamp</span> or
+              <span class="mono">give it to mia</span>. This is the interesting part pulled out of
+              the server and rewritten small: synonyms, ambiguity resolution, multi-object lists,
+              implicit <span class="mono">it</span>, and the message you get when two things could
+              match. Every response comes from the parser in the page, not from a script, so you
+              can say something absurd and watch it fail honestly.</p>
           </div>
           <div class="plates">
             <figure class="plate"><img src="parser/shot.png" alt="Parser playground" loading="lazy"><figcaption>parser · ambiguity, on purpose</figcaption></figure>
+            <div class="clip"><span class="h">an exchange, unscripted</span><span class="you">&gt; take the lantern</span>
+Which one — the rusty lantern or the brass lantern?
+<span class="you">&gt; rusty</span>
+You take the rusty lantern.
+<span class="you">&gt; give it to mia</span>
+You give the rusty lantern to Mia.
+Mia takes it, looks at it, and puts it out of sight.</div>
           </div>
         </div>
         <div class="entry" style="margin-top:18px">
