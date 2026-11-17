@@ -7,52 +7,58 @@
 <link rel="icon" href="../favicon.png">
 <meta name="description" content="Drop rooms, wire exits, export the coordinate shape a MUD server sends to a client mapper. Catches dead exits, duplicate squares and unreachable pockets.">
 <style>
-:root{--paper:#efece3;--ink:#1c1a16;--ink2:#4c4740;--ink3:#7a736a;--rule:#c9c3b6;
-  --brass:#8a5a1e;--oxide:#3d5a4a;--bad:#9a3a2a;--panel:#e6e2d7}
+/* same three faces as the homepage: serif to read, sans to operate, mono for
+   anything that is a fact or the machine's own output */
+:root{--paper:#0f1113;--panel:#15181b;--raise:#1b1f23;--ink:#e8e6e1;--ink2:#b4b1aa;
+  --ink3:#7d8288;--rule:#282d33;--rule2:#3b4249;--brass:#d9a441;--oxide:#63a58c;--bad:#d9614c;
+  --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  --sans:ui-sans-serif,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Georgia,'Times New Roman',serif}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
-  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.014) 0 1px,transparent 1px 3px),
-                   repeating-linear-gradient(90deg,rgba(0,0,0,.01) 0 1px,transparent 1px 4px)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:26px 26px}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-header{display:flex;gap:18px;align-items:flex-end;padding:26px 22px 16px;border-bottom:3px double var(--rule);flex-wrap:wrap}
+header{display:flex;gap:18px;align-items:flex-end;padding:30px 22px 18px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
 h1{font-size:clamp(26px,3.4vw,36px);line-height:1;margin:0;font-weight:400;letter-spacing:-.01em}
 h1 b{font-weight:700}
-.tag{margin:7px 0 0;font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink2);letter-spacing:.05em}
+.tag{margin:8px 0 0;font:12px/1.5 var(--sans);color:var(--ink3)}
 .mast-r{margin-left:auto;display:grid;gap:7px;justify-items:end;text-align:right}
-.mast-r .facts{font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink3)}
-.back{font:12px/1 ui-monospace,Menlo,monospace;color:var(--ink2);text-decoration:none;
-  border-bottom:1px solid var(--rule)}
+.mast-r .facts{font:11px/1.5 var(--mono);color:var(--ink3)}
+.back{font:600 12px/1 var(--sans);letter-spacing:.02em;color:var(--ink2);text-decoration:none;
+  border-bottom:1px solid var(--rule2)}
 .back:hover{color:var(--brass);border-bottom-color:var(--brass)}
 main{display:grid;grid-template-columns:230px 1fr 260px;gap:0;align-items:start}
 @media(max-width:900px){main{grid-template-columns:1fr}}
 .panel{padding:14px 16px;border-right:1px solid var(--rule)}
 .panel:last-child{border-right:0;border-left:1px solid var(--rule)}
-h2{font:10px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px}
+h2{font:600 10px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin:0 0 12px}
 .group{margin-bottom:20px}
-button{font:12px/1 ui-monospace,Menlo,monospace;padding:8px 10px;background:var(--panel);color:var(--ink);
-  border:1px solid var(--rule);cursor:pointer;text-align:left;width:100%}
-button:hover{background:#ded8c9}
-button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button{font:600 12px/1.2 var(--sans);letter-spacing:.02em;padding:9px 11px;background:var(--panel);color:var(--ink2);
+  border:1px solid var(--rule2);cursor:pointer;text-align:left;width:100%}
+button:hover{background:var(--raise);color:var(--ink)}
+button.on{background:var(--brass);color:#14161a;border-color:var(--brass)}
 .dpad{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px}
 .dpad button{text-align:center;padding:9px 0}
 .dpad .sp{visibility:hidden}
-#wrap{position:relative;background:#fbfaf6;border-right:1px solid var(--rule)}
-canvas{display:block;width:100%;max-width:860px;margin:0 auto;height:auto;cursor:crosshair;touch-action:none}
-#info{padding:10px 16px;font:11px/1.7 ui-monospace,Menlo,monospace;color:var(--ink2);border-top:1px solid var(--rule);background:var(--panel)}
-ul.issues{list-style:none;margin:0;padding:0;font:11.5px/1.5 ui-monospace,Menlo,monospace}
-ul.issues li{padding:7px 8px;margin-bottom:6px;background:#f6efe2;border-left:3px solid var(--brass);color:var(--ink2)}
-ul.issues li.bad{background:#f7e9e5;border-left-color:var(--bad)}
-ul.issues li.ok{background:#e9f0e8;border-left-color:var(--oxide)}
+#wrap{position:relative;background:#14171a;border-right:1px solid var(--rule)}
+canvas{display:block;width:100%;max-width:860px;margin:0 auto;height:auto;cursor:crosshair;
+  touch-action:none;background:#14171a}
+#info{padding:11px 16px;font:11px/1.7 var(--mono);color:var(--ink2);border-top:1px solid var(--rule);background:var(--panel)}
+ul.issues{list-style:none;margin:0;padding:0;font:11.5px/1.55 var(--mono)}
+ul.issues li{padding:7px 8px;margin-bottom:6px;background:#1e1a12;border-left:3px solid var(--brass);color:var(--ink2)}
+ul.issues li.bad{background:#241715;border-left-color:var(--bad)}
+ul.issues li.ok{background:#16211c;border-left-color:var(--oxide)}
 textarea{width:100%;height:150px;font:11px/1.5 ui-monospace,Menlo,monospace;border:1px solid var(--rule);
-  background:#fbfaf6;color:var(--ink);padding:8px;resize:vertical}
-.hint{font:11.5px/1.65 ui-monospace,Menlo,monospace;color:var(--ink2);margin:10px 0 0}
-.hint b{color:var(--ink);font-weight:700}
-ul.steps{list-style:none;margin:10px 0 0;padding:0;font:11.5px/1.6 ui-monospace,Menlo,monospace;color:var(--ink2)}
+  background:#14171a;color:var(--ink);padding:8px;resize:vertical}
+.hint{font:11.5px/1.7 var(--sans);color:var(--ink3);margin:10px 0 0;max-width:70ch}
+.hint b{color:var(--ink);font-weight:600}
+ul.steps{list-style:none;margin:10px 0 0;padding:0;font:11.5px/1.65 var(--sans);color:var(--ink3)}
 ul.steps li{padding-left:17px;position:relative;margin-bottom:8px}
 ul.steps li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;
   background:var(--brass);opacity:.8}
-ul.steps b{color:var(--ink);font-weight:700}
+ul.steps b{color:var(--ink);font-weight:600}
 .row{display:flex;gap:6px;margin-top:8px}
 .row button{width:auto;flex:1;text-align:center}
 </style>
@@ -295,7 +301,7 @@ function draw() {
   const v = viewBox();     // shared with the click handler so the two cannot drift
   const CELL = v.c, bw = Math.round(CELL * .62), bh = Math.round(CELL * .5);
   // grid
-  ctx.strokeStyle = 'rgba(120,110,90,.16)'; ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(255,255,255,.055)'; ctx.lineWidth = 1;
   for (let x = (v.ox % CELL + CELL) % CELL; x <= BASE_W; x += CELL) { ctx.beginPath(); ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, BASE_H); ctx.stroke(); }
   for (let y = (v.oy % CELL + CELL) % CELL; y <= BASE_H; y += CELL) { ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(BASE_W, y + .5); ctx.stroke(); }
   const cx = r => v.ox + r.gx * CELL + CELL / 2 + view.x;
@@ -321,7 +327,7 @@ function draw() {
     const ra = halfAlong(u || [Math.cos(a), Math.sin(a)], bw, bh);
     const sx = x1 + Math.cos(a) * ra, sy = y1 + Math.sin(a) * ra;
     const len = Math.hypot(x2 - x1, y2 - y1) - ra * 2;
-    ctx.strokeStyle = u ? '#8a7f63' : '#a9966f';
+    ctx.strokeStyle = u ? '#5f676f' : '#8a6f3f';
     ctx.lineWidth = 1.5; ctx.setLineDash(u ? [] : [4, 4]);
     ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + Math.cos(a) * len, sy + Math.sin(a) * len); ctx.stroke();
     ctx.setLineDash([]);
@@ -349,26 +355,26 @@ function draw() {
     const fs = Math.round(CELL * (u ? .13 : .115));
     ctx.font = fs + 'px ui-monospace, Menlo, monospace'; ctx.textAlign = 'center';
     const tw = ctx.measureText(label).width + 6;
-    ctx.fillStyle = '#fbfaf6';
+    ctx.fillStyle = '#14171a';
     ctx.fillRect(lx - tw / 2, ly - fs, tw, fs + 5);
-    ctx.fillStyle = u ? '#5d5645' : '#8a6a3a'; ctx.fillText(label, lx, ly + 3);
+    ctx.fillStyle = u ? '#9aa1a8' : '#c79a52'; ctx.fillText(label, lx, ly + 3);
   }));
 
   // rooms
   rooms.forEach(r => {
     const on = r.id === sel, from = r.id === src, to = r.id === dst, wrong = bad.has(r.id);
-    ctx.fillStyle = on ? '#1c1a16' : from ? '#8a5a1e' : '#fffdf7';
-    ctx.strokeStyle = wrong ? '#9a3a2a' : to ? '#3d5a4a' : on ? '#1c1a16' : '#7d7460';
+    ctx.fillStyle = on ? '#e8e6e1' : from ? '#d9a441' : '#23282e';
+    ctx.strokeStyle = wrong ? '#d9614c' : to ? '#63a58c' : on ? '#e8e6e1' : '#4a5158';
     ctx.lineWidth = on || to || wrong ? 2 : 1.2;
     ctx.fillRect(cx(r) - bw / 2, cy(r) - bh / 2, bw, bh);
     ctx.strokeRect(cx(r) - bw / 2, cy(r) - bh / 2, bw, bh);
     ctx.textAlign = 'left'; ctx.font = Math.round(CELL * .13) + 'px ui-monospace, Menlo, monospace';
-    ctx.fillStyle = on || from ? 'rgba(239,236,227,.6)' : 'rgba(63,58,49,.55)';
+    ctx.fillStyle = on || from ? 'rgba(20,22,26,.6)' : 'rgba(210,215,220,.5)';
     ctx.fillText(String(r.id), cx(r) - bw / 2 + 4, cy(r) - bh / 2 + Math.round(CELL * .13) + 4);
     // The name is wrapped into the box, never allowed to run over a
     // neighbour: shrink the type first, then break it over two lines, and
     // only then ellipsis. This is what made the earlier render unreadable.
-    ctx.textAlign = 'center'; ctx.fillStyle = on || from ? '#efece3' : wrong ? '#9a3a2a' : '#3f3a31';
+    ctx.textAlign = 'center'; ctx.fillStyle = on || from ? '#14161a' : wrong ? '#d9614c' : '#dfe3e7';
     const lines = fitName(r.name, bw - 10, Math.round(CELL * .17));
     const lh = Math.round(lines.fs * 1.12);
     const y0 = cy(r) - ((lines.rows.length - 1) * lh) / 2 + Math.round(lines.fs * .36);
@@ -376,7 +382,7 @@ function draw() {
       ctx.font = lines.fs + 'px Georgia, serif';
       ctx.fillText(ln, cx(r), y0 + i * lh);
     });
-    if (!r.placed) { ctx.strokeStyle = '#9a3a2a'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+    if (!r.placed) { ctx.strokeStyle = '#d9614c'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
       ctx.strokeRect(cx(r) - bw / 2 - 5, cy(r) - bh / 2 - 5, bw + 10, bh + 10); ctx.setLineDash([]); }
   });
 

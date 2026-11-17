@@ -9,109 +9,148 @@
 <link rel="apple-touch-icon" href="icon-512.png">
 <style>
 /* Hand-written stylesheet. No framework, no build step, one file.
-   Serif for reading, mono for anything that is a fact. */
+   Three faces, three jobs: serif for anything you read, sans for anything you
+   operate, mono for anything that is a fact or a machine's own output. */
 :root{
-  --paper:#efece3; --paper2:#e6e2d7; --ink:#1c1a16; --ink2:#4c4740; --ink3:#7a736a;
-  --rule:#c9c3b6; --brass:#8a5a1e; --oxide:#3d5a4a; --tape:#d8cf9f;
+  --bg:#0f1113; --bg2:#15181b; --bg3:#1b1f23;
+  --fg:#e8e6e1; --fg2:#b4b1aa; --fg3:#7d8288;
+  --line:#282d33; --line2:#3b4249;
+  --brass:#d9a441; --oxide:#63a58c; --bad:#d9614c;
+  --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  --sans:ui-sans-serif,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  /* a 1.25 scale, so the jump from body to display is measured rather than eyeballed */
+  --s0:17px; --s1:21px; --s2:26px; --s3:32px; --s4:40px; --s5:clamp(44px,6.8vw,68px);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);
-  font:17px/1.62 Georgia,'Iowan Old Style','Times New Roman',serif;
-  -webkit-font-smoothing:antialiased}
-/* faint fibre so the paper is not a flat colour */
-body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
-  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.014) 0 1px,transparent 1px 3px),
-                   repeating-linear-gradient(90deg,rgba(0,0,0,.01) 0 1px,transparent 1px 4px)}
-.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
-.wrap{max-width:940px;margin:0 auto;padding:0 26px}
-a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:var(--s0)/1.62 var(--serif);-webkit-font-smoothing:antialiased}
+/* a dot grid rather than paper fibre: same idea, reads engineered instead of craft */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:26px 26px}
+.wrap{max-width:960px;margin:0 auto;padding:0 26px;position:relative;z-index:1}
+.mono{font-family:var(--mono)}
+a{color:var(--fg);text-decoration:none;border-bottom:1px solid var(--line2)}
 a:hover{color:var(--brass);border-bottom-color:var(--brass)}
-h2{font:11px/1 ui-monospace,Menlo,monospace;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--ink3);margin:0 0 22px;padding-bottom:9px;border-bottom:1px solid var(--rule)}
+h2{font:600 11px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--fg3);margin:0 0 26px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+
+/* sticky index: appears once the masthead is gone, marks the row you are reading */
+.topbar{position:fixed;inset:0 0 auto;z-index:20;background:rgba(15,17,19,.94);
+  border-bottom:1px solid var(--line);transform:translateY(-100%);transition:transform .3s ease}
+.topbar.on{transform:none}
+.tb-in{display:flex;gap:20px;align-items:center;padding-top:11px;padding-bottom:11px;
+  font:12px/1 var(--sans);letter-spacing:.03em}
+.tb-name{font-weight:600;color:var(--fg)}
+.tb-nav{display:flex;gap:16px;margin-left:auto;flex-wrap:wrap}
+.tb-nav a{border-bottom:0;color:var(--fg3)}
+.tb-nav a:hover,.tb-nav a.cur{color:var(--brass)}
+.tb-play{border:1px solid var(--line2);padding:5px 10px;color:var(--fg2)}
+.tb-play:hover{border-color:var(--brass);color:var(--brass)}
+@media(max-width:700px){.tb-nav{display:none}}
 
 /* masthead */
-.mast{padding:64px 0 30px;border-bottom:3px double var(--rule)}
-.mast h1{font-size:clamp(38px,7vw,68px);line-height:.98;margin:0;font-weight:400;letter-spacing:-.02em}
+.mast{padding:88px 0 40px;border-bottom:1px solid var(--line)}
+.mast h1{font-size:var(--s5);line-height:.96;margin:0;font-weight:400;letter-spacing:-.025em}
 .mast h1 b{font-weight:700}
-.mast .line{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin-top:18px}
-.mast .job{font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--oxide);letter-spacing:.06em}
-.mast .upd{font:11px/1.4 ui-monospace,Menlo,monospace;color:var(--ink3);margin-left:auto}
-/* ch is measured on a digit, which is wider than running text, so 60ch here was
-   still 84 characters a line. Measured the rendered text: Georgia at 19px runs
-   about 8px a character, so 28em lands near 67. */
-.pitch{font-size:19px;line-height:1.6;max-width:28em;margin:0;color:var(--ink2)}
-.mast-body{display:grid;grid-template-columns:1fr 196px;gap:34px;align-items:start;margin:26px 0 0}
-.mast .index{display:grid;gap:7px;font:12px/1.4 ui-monospace,Menlo,monospace;
-  border-left:1px solid var(--rule);padding-left:16px}
-.mast .index .h{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
-.mast .index a{border-bottom:0;color:var(--ink2);display:block}
+.mast .line{display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;margin-top:22px}
+.mast .job{font:600 12px/1.4 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+.mast .upd{font:11px/1.4 var(--mono);color:var(--fg3);margin-left:auto}
+/* ch measures the digit zero, which is wider than running text: 60ch here was
+   still 84 characters a line, so the measure is capped in em instead */
+.pitch{font-size:var(--s1);line-height:1.58;max-width:26em;margin:0;color:var(--fg2)}
+.pitch em{font-style:italic;color:var(--fg)}
+.mast-body{display:grid;grid-template-columns:1fr 200px;gap:38px;align-items:start;margin:30px 0 0}
+.mast .index{display:grid;gap:9px;font:12px/1.4 var(--sans);
+  border-left:1px solid var(--line);padding-left:18px}
+.mast .index .h{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg3);margin-bottom:4px}
+.mast .index a{border-bottom:0;color:var(--fg2);display:block}
 .mast .index a:hover{color:var(--brass)}
-.mast .index .n{color:var(--ink3);margin-right:7px}
-@media(max-width:780px){.mast-body{grid-template-columns:1fr;gap:22px}}
-.pitch em{font-style:italic;color:var(--ink)}
-.entry{margin:22px 0 0;display:flex;gap:10px;flex-wrap:wrap;font:13px/1 ui-monospace,Menlo,monospace}
-.entry a{padding:7px 11px;border:1px solid var(--ink);background:var(--paper2)}
-.entry a:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.mast .index .n{font-family:var(--mono);color:var(--fg3);margin-right:8px}
+@media(max-width:780px){.mast-body{grid-template-columns:1fr;gap:26px}.mast{padding-top:56px}}
+.entry{margin:26px 0 0;display:flex;gap:10px;flex-wrap:wrap;font:600 12px/1 var(--sans);letter-spacing:.04em}
+.entry a{padding:9px 14px;border:1px solid var(--line2);background:var(--bg2);color:var(--fg2)}
+.entry a:hover{background:var(--brass);color:#14161a;border-color:var(--brass)}
 
 /* numbered index rows */
-section{padding:46px 0 8px}
-.row{display:grid;grid-template-columns:52px 1fr;gap:0 22px;padding:26px 0;border-bottom:1px solid var(--rule)}
+section{padding:64px 0 12px}
+.row{display:grid;grid-template-columns:56px 1fr;gap:0 24px;padding:38px 0;border-bottom:1px solid var(--line);
+  scroll-margin-top:74px}
 .row:last-child{border-bottom:0}
-.num{font:12px/1.9 ui-monospace,Menlo,monospace;color:var(--ink3)}
-.row h3{font-size:clamp(21px,2.4vw,26px);margin:0;font-weight:400;letter-spacing:-.01em;
-  max-width:44ch;text-wrap:balance}
+.num{font:12px/2.1 var(--mono);color:var(--fg3)}
+.row h3{font-size:var(--s3);margin:0;font-weight:400;letter-spacing:-.015em;
+  max-width:30ch;text-wrap:balance;line-height:1.16}
 .row h3 b{font-weight:700}
-.meta{font:12px/1.5 ui-monospace,Menlo,monospace;color:var(--ink3);margin:7px 0 12px;
-  max-width:62ch;text-wrap:pretty}
+.meta{font:11.5px/1.6 var(--mono);color:var(--fg3);margin:10px 0 16px;max-width:62ch;text-wrap:pretty}
 .meta i{font-style:normal;color:var(--oxide)}
-.row p{margin:0 0 12px;max-width:62ch;text-wrap:pretty}
-.row .mono{font-size:.84em}
+.row p{margin:0 0 14px;max-width:60ch;text-wrap:pretty;color:var(--fg2)}
 .row p:last-child{margin-bottom:0}
-.body{display:grid;grid-template-columns:1.28fr .72fr;gap:30px;align-items:start}
-@media(max-width:780px){.body{grid-template-columns:1fr;gap:22px}.row{grid-template-columns:34px 1fr}}
+.row .mono{font-size:.84em;color:var(--fg)}
+.body{display:grid;grid-template-columns:1.28fr .72fr;gap:34px;align-items:start}
+@media(max-width:780px){.body{grid-template-columns:1fr;gap:26px}.row{grid-template-columns:34px 1fr}}
 
-/* taped screenshots */
-.plate{margin:0 0 16px;position:relative;background:#fff;padding:9px 9px 40px;
-  border:1px solid var(--rule);box-shadow:0 12px 26px rgba(40,34,20,.14);transform:rotate(-.7deg)}
-.plate:nth-child(even){transform:rotate(.9deg)}
-.plate::before{content:"";position:absolute;top:-11px;left:26px;width:74px;height:20px;
-  background:var(--tape);opacity:.85;transform:rotate(-2.4deg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+/* matted prints: a dark mount and a hairline, no tape, no tilt, no shadow */
+.plate{margin:0 0 20px;background:var(--bg2);padding:11px 11px 12px;border:1px solid var(--line)}
 .plate img{display:block;width:100%;height:auto;max-height:320px;object-fit:contain;
-  cursor:zoom-in;border:1px solid var(--rule)}
-.plate figcaption{position:absolute;left:11px;right:11px;bottom:11px;
-  font:11px/1.35 ui-monospace,Menlo,monospace;color:var(--ink3)}
+  cursor:zoom-in;border:1px solid var(--line2);background:var(--bg3)}
+.plate figcaption{margin:11px 2px 1px;font:11px/1.45 var(--sans);letter-spacing:.03em;color:var(--fg3)}
 .plates{display:grid;gap:20px}
 
-/* real output from the tools, set quieter than a plate */
-.clip{border-left:3px solid var(--oxide);background:var(--paper2);padding:12px 14px;
-  font:11px/1.7 ui-monospace,Menlo,monospace;color:var(--ink2);white-space:pre-wrap}
-.clip .h{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--oxide);margin-bottom:8px}
-.clip .bad{color:#8a3527}
-.clip .you{color:var(--ink)}
+/* real output from the tools, quieter than a plate */
+.clip{border-left:2px solid var(--oxide);background:var(--bg2);padding:14px 16px;
+  font:11px/1.75 var(--mono);color:var(--fg2);white-space:pre-wrap}
+.clip .h{display:block;font:600 10px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--oxide);margin-bottom:10px}
+.clip .bad{color:var(--bad)}
+.clip .you{color:var(--fg)}
 
 /* plain lists, not cards */
-dl.facts{margin:0;font:13px/1.9 ui-monospace,Menlo,monospace;display:grid;grid-template-columns:auto 1fr}
-dl.facts dt{color:var(--ink3);padding-right:16px;white-space:nowrap}
-dl.facts dd{margin:0;color:var(--ink2)}
+dl.facts{margin:0;font:12px/1.9 var(--mono);display:grid;grid-template-columns:auto 1fr}
+dl.facts dt{color:var(--fg3);padding-right:18px;white-space:nowrap}
+dl.facts dd{margin:0;color:var(--fg2)}
 ul.notes{margin:0;padding-left:0;list-style:none}
-ul.notes li{margin:0 0 11px;padding-left:19px;position:relative}
-ul.notes li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;
-  background:var(--brass);opacity:.8}
-.aside{background:var(--paper2);border-left:3px solid var(--brass);padding:16px 18px;font-size:15px;color:var(--ink2)}
-.aside .h{font:11px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--brass);display:block;margin-bottom:9px}
-footer{margin-top:40px;padding:30px 0 60px;border-top:3px double var(--rule);
-  font:12px/1.9 ui-monospace,Menlo,monospace;color:var(--ink3)}
-footer a{color:var(--ink2)}
-footer p{margin:0;max-width:88ch}
-#lightbox{position:fixed;inset:0;background:rgba(28,26,22,.94);display:none;place-items:center;z-index:30;padding:24px;cursor:zoom-out}
+ul.notes li{margin:0 0 13px;padding-left:20px;position:relative;color:var(--fg2)}
+ul.notes li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;
+  background:var(--brass)}
+ul.notes b{color:var(--fg);font-weight:700}
+.aside{background:var(--bg2);border-left:2px solid var(--brass);padding:18px 20px;
+  font-size:16px;line-height:1.62;color:var(--fg2)}
+.aside .h{font:600 10px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--brass);display:block;margin-bottom:11px}
+footer{margin-top:56px;padding:34px 0 72px;border-top:1px solid var(--line);
+  font:12px/1.85 var(--sans);color:var(--fg3)}
+footer a{color:var(--fg2);border-bottom-color:var(--line2)}
+footer p{margin:0;max-width:80ch}
+
+#lightbox{position:fixed;inset:0;background:rgba(8,9,11,.96);display:none;place-items:center;
+  z-index:30;padding:24px;cursor:zoom-out}
 #lightbox.on{display:grid}
-#lightbox img{max-width:100%;max-height:86vh;background:#fff;padding:10px}
-@media(prefers-reduced-motion:reduce){.plate{transform:none}}
+#lightbox img{max-width:100%;max-height:86vh;background:var(--bg2);padding:10px;border:1px solid var(--line2)}
+
+/* content arrives instead of being already there; never at the expense of
+   anyone who asked for no motion */
+.reveal{opacity:1;transform:none}
+html.js .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
+html.js .reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  html.js .reveal{opacity:1;transform:none;transition:none}
+  .topbar{transition:none}
+}
 </style>
 </head>
 <body>
+
+<div class="topbar" id="topbar"><div class="wrap tb-in">
+  <span class="tb-name">Enrico Sgiarovello</span>
+  <nav class="tb-nav" aria-label="sections">
+    <a href="#01">01 Fablerift</a><a href="#02">02 Roomsmith</a>
+    <a href="#03">03 Parser lab</a><a href="#small">Smaller things</a>
+  </nav>
+  <a class="tb-play" href="https://play.fablerift.net/">play fablerift</a>
+</div></div>
 
 <div class="wrap">
 
@@ -144,7 +183,7 @@ footer p{margin:0;max-width:88ch}
   <section>
     <h2>Things I made and finished</h2>
 
-    <div class="row" id="01">
+    <div class="row reveal" id="01">
       <div class="num">01</div>
       <div>
         <h3><b>Fablerift</b> — text RPG, browser + Telnet + SSH</h3>
@@ -185,7 +224,7 @@ footer p{margin:0;max-width:88ch}
         <p class="meta" style="margin-top:14px">source repo is still private while the game is live — the release page, the update feed and the server list are not. ask and I will walk you through the code.</p>
       </div>
     </div>
-    <div class="row" id="02">
+    <div class="row reveal" id="02">
       <div class="num">02</div>
       <div>
         <h3><b>Roomsmith</b> — level graph editor that exports my server's coordinates</h3>
@@ -212,7 +251,7 @@ footer p{margin:0;max-width:88ch}
       </div>
     </div>
 
-    <div class="row" id="03">
+    <div class="row reveal" id="03">
       <div class="num">03</div>
       <div>
         <h3><b>Parser playground</b> — the command grammar, isolated</h3>
@@ -245,7 +284,7 @@ Mia takes it, looks at it, and puts it out of sight.</div>
     </div>
   </section>
 
-  <section id="small">
+  <section id="small" class="reveal">
     <h2>Smaller things, and what is not here</h2>
     <div class="body">
       <div>
@@ -312,6 +351,30 @@ document.querySelectorAll('.plate img').forEach(im => im.addEventListener('click
 }));
 box.addEventListener('click', () => box.classList.remove('on'));
 addEventListener('keydown', e => { if (e.key === 'Escape') box.classList.remove('on'); });
+
+/* Rows arrive once they are in view. If IntersectionObserver is missing, or the
+   user asked for no motion, everything is simply visible from the start. */
+document.documentElement.classList.add('js');
+const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const marks = document.querySelectorAll('.reveal');
+if (!reduce && 'IntersectionObserver' in window) {
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), {rootMargin: '0px 0px -12% 0px'});
+  marks.forEach(m => io.observe(m));
+} else marks.forEach(m => m.classList.add('in'));
+
+const bar = document.getElementById('topbar');
+addEventListener('scroll', () => bar.classList.toggle('on', scrollY > 260), {passive: true});
+
+/* the index bar marks the row you are actually reading */
+const links = {}; document.querySelectorAll('.tb-nav a').forEach(a => links[a.hash.slice(1)] = a);
+const spy = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  Object.values(links).forEach(a => a.classList.remove('cur'));
+  const a = links[e.target.id]; if (a) a.classList.add('cur');
+}), {rootMargin: '-45% 0px -50% 0px'});
+document.querySelectorAll('.row[id], section#small').forEach(r => spy.observe(r));
 </script>
 </body>
 </html>

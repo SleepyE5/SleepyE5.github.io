@@ -7,59 +7,64 @@
 <link rel="icon" href="../favicon.png">
 <meta name="description" content="Synonyms, ambiguity, multi-object lists and implicit it, taken out of a MUD server and rewritten small enough to read. Type anything; the replies come from the parser, not from a script.">
 <style>
-:root{--paper:#efece3;--ink:#1c1a16;--ink2:#4c4740;--ink3:#7a736a;--rule:#c9c3b6;
-  --brass:#8a5a1e;--oxide:#3d5a4a;--bad:#9a3a2a;--panel:#e6e2d7}
+/* same three faces as the homepage: serif to read, sans to operate, mono for
+   anything that is a fact or the machine's own output */
+:root{--paper:#0f1113;--panel:#15181b;--raise:#1b1f23;--ink:#e8e6e1;--ink2:#b4b1aa;
+  --ink3:#7d8288;--rule:#282d33;--rule2:#3b4249;--brass:#d9a441;--oxide:#63a58c;--bad:#d9614c;
+  --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  --sans:ui-sans-serif,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Georgia,'Times New Roman',serif}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
-  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.014) 0 1px,transparent 1px 3px),
-                   repeating-linear-gradient(90deg,rgba(0,0,0,.01) 0 1px,transparent 1px 4px)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:26px 26px}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-header{display:flex;gap:18px;align-items:flex-end;padding:26px 22px 16px;border-bottom:3px double var(--rule);flex-wrap:wrap}
+header{display:flex;gap:18px;align-items:flex-end;padding:30px 22px 18px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
 h1{font-size:clamp(26px,3.4vw,36px);line-height:1;margin:0;font-weight:400;letter-spacing:-.01em}
 h1 b{font-weight:700}
-.tag{margin:7px 0 0;font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink2);letter-spacing:.05em}
+.tag{margin:8px 0 0;font:12px/1.5 var(--sans);color:var(--ink3)}
 .mast-r{margin-left:auto;display:grid;gap:7px;justify-items:end;text-align:right}
-.mast-r .facts{font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink3)}
-.back{font:12px/1 ui-monospace,Menlo,monospace;color:var(--ink2);text-decoration:none;
-  border-bottom:1px solid var(--rule)}
+.mast-r .facts{font:11px/1.5 var(--mono);color:var(--ink3)}
+.back{font:600 12px/1 var(--sans);letter-spacing:.02em;color:var(--ink2);text-decoration:none;
+  border-bottom:1px solid var(--rule2)}
 .back:hover{color:var(--brass);border-bottom-color:var(--brass)}
 main{display:grid;grid-template-columns:220px 1fr 250px;gap:0;align-items:start}
 @media(max-width:900px){main{grid-template-columns:1fr}}
 .panel{padding:14px 16px;border-right:1px solid var(--rule)}
 .panel:last-child{border-right:0;border-left:1px solid var(--rule)}
-h2{font:10px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px}
+h2{font:600 10px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin:0 0 12px}
 .group{margin-bottom:20px}
-button{font:12px/1.2 ui-monospace,Menlo,monospace;padding:7px 9px;background:var(--panel);color:var(--ink);
-  border:1px solid var(--rule);cursor:pointer;text-align:left;width:100%;margin-bottom:5px}
-button:hover{background:#ded8c9;border-color:var(--brass)}
+button{font:600 12px/1.2 var(--sans);letter-spacing:.02em;padding:8px 10px;background:var(--panel);color:var(--ink2);
+  border:1px solid var(--rule2);cursor:pointer;text-align:left;width:100%;margin-bottom:5px}
+button:hover{background:var(--raise);border-color:var(--brass);color:var(--ink)}
 #stage{padding:16px 18px}
-#prompt{display:flex;gap:8px;align-items:center;border:1px solid var(--rule);background:#fbfaf6;padding:9px 11px}
+#prompt{display:flex;gap:8px;align-items:center;border:1px solid var(--rule2);background:#14171a;padding:10px 12px}
 #prompt span{font:15px/1 ui-monospace,Menlo,monospace;color:var(--brass)}
 #cmd{flex:1;border:0;outline:0;background:transparent;font:15px/1.4 ui-monospace,Menlo,monospace;color:var(--ink)}
-#transcript{height:220px;overflow-y:auto;border:1px solid var(--rule);border-top:0;background:#fbfaf6;
-  font:12.5px/1.65 ui-monospace,Menlo,monospace;padding:10px 12px}
+#transcript{height:220px;overflow-y:auto;border:1px solid var(--rule2);border-top:0;background:#14171a;
+  font:12.5px/1.7 var(--mono);padding:11px 13px}
 #transcript p{margin:0 0 9px}
 #transcript .you{color:var(--ink2)}
 #transcript .you::before{content:"> ";color:var(--brass)}
 #transcript .say{color:var(--ink);border-left:2px solid var(--rule);padding-left:9px}
-#transcript .say.no{border-left-color:var(--bad);color:#7d3b2e}
-#transcript .say.ask{border-left-color:var(--brass);color:#6b4715}
+#transcript .say.no{border-left-color:var(--bad);color:#e08069}
+#transcript .say.ask{border-left-color:var(--brass);color:#d9a441}
 #transcript .say.sys{border-left-color:var(--oxide);color:var(--oxide)}
-canvas{display:block;width:100%;height:auto;margin-top:14px;border:1px solid var(--rule);background:#fbfaf6}
+canvas{display:block;width:100%;height:auto;margin-top:14px;border:1px solid var(--rule);background:#14171a}
 ul.world{list-style:none;margin:0;padding:0;font:11.5px/1.6 ui-monospace,Menlo,monospace;color:var(--ink2)}
 ul.world li{padding:3px 0;border-bottom:1px dotted var(--rule)}
 ul.world li b{font-weight:400;color:var(--ink)}
 ul.world li em{font-style:normal;color:var(--brass)}
-.hint{font:11.5px/1.65 ui-monospace,Menlo,monospace;color:var(--ink2);margin:10px 0 0}
-.hint b{color:var(--ink);font-weight:700}
-ul.steps{list-style:none;margin:10px 0 0;padding:0;font:11.5px/1.6 ui-monospace,Menlo,monospace;color:var(--ink2)}
+.hint{font:11.5px/1.7 var(--sans);color:var(--ink3);margin:10px 0 0;max-width:70ch}
+.hint b{color:var(--ink);font-weight:600}
+ul.steps{list-style:none;margin:10px 0 0;padding:0;font:11.5px/1.65 var(--sans);color:var(--ink3)}
 ul.steps li{padding-left:17px;position:relative;margin-bottom:8px}
 ul.steps li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;
   background:var(--brass);opacity:.8}
-ul.steps b{color:var(--ink);font-weight:700}
-#tree{margin:0;font:11px/1.55 ui-monospace,Menlo,monospace;color:var(--ink2);white-space:pre-wrap;
-  background:#fbfaf6;border:1px solid var(--rule);padding:9px 10px;min-height:120px}
+ul.steps b{color:var(--ink);font-weight:600}
+#tree{margin:0;font:11px/1.6 var(--mono);color:var(--ink2);white-space:pre-wrap;
+  background:#14171a;border:1px solid var(--rule2);padding:10px 11px;min-height:120px}
 </style>
 </head>
 <body>
@@ -463,8 +468,8 @@ function tree(input, res) {
    thing the slot resolved to */
 const cv = $('d'), ctx = cv.getContext('2d');
 const BASE_W = 760, BASE_H = 250;
-const ROLE_COLOR = {verb: '#1c1a16', article: '#b8b1a2', filler: '#b8b1a2', noun: '#3d5a4a',
-  modifier: '#8a5a1e', preposition: '#5d5645', pronoun: '#8a5a1e', list: '#c9c3b6', unknown: '#9a3a2a'};
+const ROLE_COLOR = {verb: '#d9a441', article: '#5a6068', filler: '#5a6068', noun: '#63a58c',
+  modifier: '#d9a441', preposition: '#9aa1a8', pronoun: '#d9a441', list: '#282d33', unknown: '#d9614c'};
 let last = {tokens: [], resolved: []};
 // where the role labels ended up, so the test can prove none of them overlap
 let lastLabels = [];
@@ -483,7 +488,7 @@ function diagram(res) {
   ctx.clearRect(0, 0, BASE_W, BASE_H);
   const toks = last.tokens || [];
   if (!toks.length) {
-    ctx.font = '13px Georgia, serif'; ctx.fillStyle = '#7a736a'; ctx.textAlign = 'center';
+    ctx.font = '13px Georgia, serif'; ctx.fillStyle = '#7d8288'; ctx.textAlign = 'center';
     ctx.fillText('Type a command and the parser will show its work.', BASE_W / 2, BASE_H / 2);
     return;
   }
@@ -499,13 +504,13 @@ function diagram(res) {
   });
   const cx = b => b.x + b.w / 2;
   boxes.forEach(b => {
-    const c = ROLE_COLOR[b.t.role] || '#7a736a';
+    const c = ROLE_COLOR[b.t.role] || '#7d8288';
     ctx.lineWidth = 1.2; ctx.strokeStyle = c;
-    ctx.fillStyle = b.t.role === 'verb' ? c : '#fffdf7';
+    ctx.fillStyle = b.t.role === 'verb' ? c : '#23282e';
     ctx.fillRect(b.x, b.y, b.w, b.h);
     ctx.strokeRect(b.x + .5, b.y + .5, b.w, b.h);
     ctx.textAlign = 'center';
-    ctx.fillStyle = b.t.role === 'verb' ? '#efece3' : '#1c1a16';
+    ctx.fillStyle = b.t.role === 'verb' ? '#14161a' : '#e8e6e1';
     ctx.font = '13px ui-monospace, Menlo, monospace';
     ctx.fillText(b.t.w, cx(b), b.y + 17);
   });
@@ -517,7 +522,7 @@ function diagram(res) {
   let right = -1e9, row = 0;
   lastLabels = [];
   boxes.forEach(b => {
-    const c = ROLE_COLOR[b.t.role] || '#7a736a';
+    const c = ROLE_COLOR[b.t.role] || '#7d8288';
     const label = b.t.role;
     const lw = ctx.measureText(label).width;
     const l = Math.max(2, cx(b) - lw / 2);
@@ -549,15 +554,15 @@ function diagram(res) {
     prev = item.x + item.w + 22;
   });
   laid.forEach(({s, anchors, label, w, x: sx}) => {
-    ctx.strokeStyle = s.kind === 'one' ? '#3d5a4a' : s.kind === 'many' ? '#8a5a1e' : '#9a3a2a';
+    ctx.strokeStyle = s.kind === 'one' ? '#63a58c' : s.kind === 'many' ? '#d9a441' : '#d9614c';
     ctx.setLineDash(s.kind === 'many' ? [4, 3] : []);
-    ctx.fillStyle = '#fbfaf6';
+    ctx.fillStyle = '#14171a';
     ctx.fillRect(sx, rowY, w, 24); ctx.strokeRect(sx + .5, rowY + .5, w, 24);
     ctx.setLineDash([]);
-    ctx.fillStyle = '#1c1a16'; ctx.font = '12px Georgia, serif';
+    ctx.fillStyle = '#e8e6e1'; ctx.font = '12px Georgia, serif';
     ctx.fillText(label, sx + 8, rowY + 16);
     anchors.forEach(b => {
-      ctx.strokeStyle = 'rgba(90,84,70,.5)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(200,205,210,.3)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(cx(b), b.y + b.h);
       const tx = Math.min(sx + w - 6, Math.max(sx + 6, cx(b)));
       ctx.lineTo(tx, rowY); ctx.stroke();
@@ -565,12 +570,12 @@ function diagram(res) {
     if (s.prep) {
       const pb = boxes.find(b => b.t.w === s.prep && b.t.role === 'preposition');
       if (pb) {
-        ctx.strokeStyle = '#5d5645'; ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = '#9aa1a8'; ctx.setLineDash([3, 3]);
         ctx.beginPath(); ctx.moveTo(cx(pb), pb.y + pb.h); ctx.lineTo(sx + 10, rowY); ctx.stroke();
         ctx.setLineDash([]);
       }
     }
-    ctx.fillStyle = '#7a736a'; ctx.font = '9px ui-monospace, Menlo, monospace'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#7d8288'; ctx.font = '9px ui-monospace, Menlo, monospace'; ctx.textAlign = 'left';
     ctx.fillText((s.prep ? s.prep + ' ' : '') + s.words.join(' '), sx, legY);
   });
 
@@ -579,7 +584,7 @@ function diagram(res) {
   ctx.font = '9px ui-monospace, Menlo, monospace'; ctx.textAlign = 'left';
   keys.forEach(k => {
     ctx.fillStyle = ROLE_COLOR[k]; ctx.fillRect(lx, BASE_H - 20, 9, 9);
-    ctx.fillStyle = '#7a736a'; ctx.fillText(k, lx + 13, BASE_H - 12);
+    ctx.fillStyle = '#7d8288'; ctx.fillText(k, lx + 13, BASE_H - 12);
     lx += 13 + ctx.measureText(k).width + 14;
   });
 }
