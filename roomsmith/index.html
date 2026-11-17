@@ -11,13 +11,19 @@
   --brass:#8a5a1e;--oxide:#3d5a4a;--bad:#9a3a2a;--panel:#e6e2d7}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Georgia,'Times New Roman',serif}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.014) 0 1px,transparent 1px 3px),
+                   repeating-linear-gradient(90deg,rgba(0,0,0,.01) 0 1px,transparent 1px 4px)}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-header{display:flex;gap:14px;align-items:baseline;padding:18px 20px 14px;border-bottom:3px double var(--rule);flex-wrap:wrap}
-h1{font-size:22px;margin:0;font-weight:400}
+header{display:flex;gap:18px;align-items:flex-end;padding:26px 22px 16px;border-bottom:3px double var(--rule);flex-wrap:wrap}
+h1{font-size:clamp(26px,3.4vw,36px);line-height:1;margin:0;font-weight:400;letter-spacing:-.01em}
 h1 b{font-weight:700}
-header p{margin:0;font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink3);letter-spacing:.05em}
-.back{margin-left:auto;font:12px/1 ui-monospace,Menlo,monospace;color:var(--ink3);text-decoration:none;border:0}
-.back:hover{color:var(--brass)}
+.tag{margin:7px 0 0;font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink2);letter-spacing:.05em}
+.mast-r{margin-left:auto;display:grid;gap:7px;justify-items:end;text-align:right}
+.mast-r .facts{font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink3)}
+.back{font:12px/1 ui-monospace,Menlo,monospace;color:var(--ink2);text-decoration:none;
+  border-bottom:1px solid var(--rule)}
+.back:hover{color:var(--brass);border-bottom-color:var(--brass)}
 main{display:grid;grid-template-columns:230px 1fr 260px;gap:0;align-items:start}
 @media(max-width:900px){main{grid-template-columns:1fr}}
 .panel{padding:14px 16px;border-right:1px solid var(--rule)}
@@ -40,16 +46,27 @@ ul.issues li.bad{background:#f7e9e5;border-left-color:var(--bad)}
 ul.issues li.ok{background:#e9f0e8;border-left-color:var(--oxide)}
 textarea{width:100%;height:150px;font:11px/1.5 ui-monospace,Menlo,monospace;border:1px solid var(--rule);
   background:#fbfaf6;color:var(--ink);padding:8px;resize:vertical}
-.hint{font:11px/1.6 ui-monospace,Menlo,monospace;color:var(--ink3);margin:8px 0 0}
+.hint{font:11.5px/1.65 ui-monospace,Menlo,monospace;color:var(--ink2);margin:10px 0 0}
+.hint b{color:var(--ink);font-weight:700}
+ul.steps{list-style:none;margin:10px 0 0;padding:0;font:11.5px/1.6 ui-monospace,Menlo,monospace;color:var(--ink2)}
+ul.steps li{padding-left:17px;position:relative;margin-bottom:8px}
+ul.steps li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;
+  background:var(--brass);opacity:.8}
+ul.steps b{color:var(--ink);font-weight:700}
 .row{display:flex;gap:6px;margin-top:8px}
 .row button{width:auto;flex:1;text-align:center}
 </style>
 </head>
 <body>
 <header>
-  <h1>ROOM<b>SMITH</b></h1>
-  <p class="mono">level graph editor · exports the coordinates a mapper draws from</p>
-  <a class="back mono" href="../">← portfolio</a>
+  <div>
+    <h1>ROOM<b>SMITH</b></h1>
+    <p class="tag">level graph editor · exports the coordinates a mapper draws from</p>
+  </div>
+  <div class="mast-r">
+    <a class="back mono" href="../">← portfolio</a>
+    <span class="facts">vanilla js · no build · nothing saved anywhere</span>
+  </div>
 </header>
 
 <main>
@@ -61,8 +78,13 @@ textarea{width:100%;height:150px;font:11px/1.5 ui-monospace,Menlo,monospace;bord
         <button id="tLink">exit</button>
         <button id="tDel">delete</button>
       </div>
-      <p class="hint">Room: click empty grid. Exit: click the source room, then the far room, then the direction. Middle-drag pans, "fit view" re-frames.</p>
-      <p class="hint">On the map the cardinals are n / s / e / w and the arrow points where the exit goes; dashed links are up, down, in and out. Hover a room to read its exits in full.</p>
+      <ul class="steps">
+        <li><b>room</b> — click an empty square</li>
+        <li><b>exit</b> — click the source, then the far room, then the direction</li>
+        <li><b>pan</b> — middle-drag; <b>fit view</b> re-frames the map</li>
+      </ul>
+      <p class="hint">On the map the cardinals are <b>n / s / e / w</b> and the arrow points where the
+        exit goes. Dashed links are up, down, in and out. Hover a room to read its exits in full.</p>
     </div>
     <div class="group" id="dirGroup" style="opacity:.4">
       <h2>Exit direction (source &rarr; far room)</h2>

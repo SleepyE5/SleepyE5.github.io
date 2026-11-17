@@ -11,13 +11,19 @@
   --brass:#8a5a1e;--oxide:#3d5a4a;--bad:#9a3a2a;--panel:#e6e2d7}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Georgia,'Times New Roman',serif}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.014) 0 1px,transparent 1px 3px),
+                   repeating-linear-gradient(90deg,rgba(0,0,0,.01) 0 1px,transparent 1px 4px)}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-header{display:flex;gap:14px;align-items:baseline;padding:18px 20px 14px;border-bottom:3px double var(--rule);flex-wrap:wrap}
-h1{font-size:22px;margin:0;font-weight:400}
+header{display:flex;gap:18px;align-items:flex-end;padding:26px 22px 16px;border-bottom:3px double var(--rule);flex-wrap:wrap}
+h1{font-size:clamp(26px,3.4vw,36px);line-height:1;margin:0;font-weight:400;letter-spacing:-.01em}
 h1 b{font-weight:700}
-header p{margin:0;font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink3);letter-spacing:.05em}
-.back{margin-left:auto;font:12px/1 ui-monospace,Menlo,monospace;color:var(--ink3);text-decoration:none}
-.back:hover{color:var(--brass)}
+.tag{margin:7px 0 0;font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink2);letter-spacing:.05em}
+.mast-r{margin-left:auto;display:grid;gap:7px;justify-items:end;text-align:right}
+.mast-r .facts{font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--ink3)}
+.back{font:12px/1 ui-monospace,Menlo,monospace;color:var(--ink2);text-decoration:none;
+  border-bottom:1px solid var(--rule)}
+.back:hover{color:var(--brass);border-bottom-color:var(--brass)}
 main{display:grid;grid-template-columns:220px 1fr 250px;gap:0;align-items:start}
 @media(max-width:900px){main{grid-template-columns:1fr}}
 .panel{padding:14px 16px;border-right:1px solid var(--rule)}
@@ -45,16 +51,27 @@ ul.world{list-style:none;margin:0;padding:0;font:11.5px/1.6 ui-monospace,Menlo,m
 ul.world li{padding:3px 0;border-bottom:1px dotted var(--rule)}
 ul.world li b{font-weight:400;color:var(--ink)}
 ul.world li em{font-style:normal;color:var(--brass)}
-.hint{font:11px/1.6 ui-monospace,Menlo,monospace;color:var(--ink3);margin:8px 0 0}
+.hint{font:11.5px/1.65 ui-monospace,Menlo,monospace;color:var(--ink2);margin:10px 0 0}
+.hint b{color:var(--ink);font-weight:700}
+ul.steps{list-style:none;margin:10px 0 0;padding:0;font:11.5px/1.6 ui-monospace,Menlo,monospace;color:var(--ink2)}
+ul.steps li{padding-left:17px;position:relative;margin-bottom:8px}
+ul.steps li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;
+  background:var(--brass);opacity:.8}
+ul.steps b{color:var(--ink);font-weight:700}
 #tree{margin:0;font:11px/1.55 ui-monospace,Menlo,monospace;color:var(--ink2);white-space:pre-wrap;
   background:#fbfaf6;border:1px solid var(--rule);padding:9px 10px;min-height:120px}
 </style>
 </head>
 <body>
 <header>
-  <h1>PARSER<b>LAB</b></h1>
-  <p class="mono">the command grammar from a MUD server, pulled out and rewritten small</p>
-  <a class="back mono" href="../">&larr; portfolio</a>
+  <div>
+    <h1>PARSER<b>LAB</b></h1>
+    <p class="tag">the command grammar from a MUD server, pulled out and rewritten small</p>
+  </div>
+  <div class="mast-r">
+    <a class="back mono" href="../">&larr; portfolio</a>
+    <span class="facts">vanilla js · no build · every reply generated</span>
+  </div>
 </header>
 
 <main>
@@ -98,14 +115,15 @@ ul.world li em{font-style:normal;color:var(--brass)}
     </div>
     <div class="group">
       <h2>How it reads you</h2>
-      <p class="hint">Verb first, then noun phrases, then a preposition with its own noun phrase.
-        A noun phrase is articles and fillers, then modifiers, then a noun. Any word left over
-        disqualifies the candidate rather than being ignored, so the parser never pretends to
-        understand <span class="mono">the green lantern</span> when no green lantern exists.</p>
-      <p class="hint">Two matches of equal strength is a question, not a coin toss. The parser
-        remembers the command it could not finish and takes the next bare answer —
-        <span class="mono">rusty</span>, <span class="mono">the brass one</span>,
-        <span class="mono">2</span> — as the rest of it.</p>
+      <ul class="steps">
+        <li><b>verb</b> first, then noun phrases, then a preposition with its own noun phrase</li>
+        <li>a noun phrase is <b>articles</b>, then <b>modifiers</b>, then a <b>noun</b></li>
+        <li>any word left over <b>disqualifies</b> the candidate rather than being ignored</li>
+        <li>two matches of equal strength is a <b>question</b>, not a coin toss</li>
+      </ul>
+      <p class="hint">So it never pretends to understand <b>the green lantern</b> when no green lantern
+        exists — and when it has to ask, it remembers the command it could not finish and takes your
+        next bare answer, <b>rusty</b> or <b>2</b>, as the rest of it.</p>
     </div>
   </div>
 </main>
@@ -513,15 +531,24 @@ function diagram(res) {
 
   const slots = last.resolved || [];
   const rowY = 150, legY = 196;
-  let sx = pad;
-  slots.forEach(s => {
-    // the anchors are the words that actually sat in this slot, so the lines
-    // cannot drift when a command has two object slots
+  // Measure every resolved box first, then drop each one under the words that
+  // produced it. Packing them from the left edge left the whole right half of
+  // the canvas empty, which made a two-slot command look unrelated to itself.
+  ctx.font = '12px Georgia, serif';
+  const laid = slots.map(s => {
     const anchors = boxes.filter(b => s.words.includes(b.t.w) && b.t.role !== 'verb');
     const label = s.kind === 'one' ? s.objs.map(o => o.the).join(' + ') :
       s.kind === 'many' ? s.objs.map(o => o.the).join(' | ') : 'nothing here matches';
-    ctx.font = '12px Georgia, serif'; ctx.textAlign = 'left';
-    const w = Math.max(70, Math.min(BASE_W - pad - sx, ctx.measureText(label).width + 18));
+    const w = Math.max(70, ctx.measureText(label).width + 18);
+    const want = anchors.length ? anchors.reduce((a, b) => a + cx(b), 0) / anchors.length : BASE_W / 2;
+    return {s, anchors, label, w, want};
+  });
+  let prev = pad;
+  laid.forEach(item => {
+    item.x = Math.min(Math.max(item.want - item.w / 2, prev), BASE_W - pad - item.w);
+    prev = item.x + item.w + 22;
+  });
+  laid.forEach(({s, anchors, label, w, x: sx}) => {
     ctx.strokeStyle = s.kind === 'one' ? '#3d5a4a' : s.kind === 'many' ? '#8a5a1e' : '#9a3a2a';
     ctx.setLineDash(s.kind === 'many' ? [4, 3] : []);
     ctx.fillStyle = '#fbfaf6';
@@ -545,7 +572,6 @@ function diagram(res) {
     }
     ctx.fillStyle = '#7a736a'; ctx.font = '9px ui-monospace, Menlo, monospace'; ctx.textAlign = 'left';
     ctx.fillText((s.prep ? s.prep + ' ' : '') + s.words.join(' '), sx, legY);
-    sx += w + 26;
   });
 
   const keys = Object.keys(ROLE_COLOR).filter(k => toks.some(t => t.role === k));
