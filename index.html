@@ -220,6 +220,8 @@ html.js .plates .plate{opacity:0;transform:translateY(14px);
 html.js .reveal.in .plates .plate{opacity:1;transform:none}
 html.js .reveal.in .plates .plate:nth-child(2){transition-delay:.1s}
 html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
+html.js .reveal.in .plates .plate:nth-child(4){transition-delay:.3s}
+html.js .reveal.in .plates .plate:nth-child(5){transition-delay:.4s}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   html.js .reveal{opacity:1;transform:none;transition:none}
@@ -315,6 +317,8 @@ html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
             <figure class="plate"><picture><source type="image/webp" srcset="assets/02-exploration.webp"><img src="assets/02-exploration.png" alt="Fablerift exploration" width="1100" height="899" loading="lazy"></picture><figcaption>exploration · pinewood vale</figcaption></figure>
             <figure class="plate"><picture><source type="image/webp" srcset="assets/03-combat.webp"><img src="assets/03-combat.png" alt="Fablerift combat" width="1100" height="899" loading="lazy"></picture><figcaption>combat, before the numbers moved</figcaption></figure>
             <figure class="plate"><picture><source type="image/webp" srcset="assets/11-phone.webp"><img src="assets/11-phone.png" alt="Fablerift phone UI" width="1100" height="2380" loading="lazy"></picture><figcaption>the in-game phone. yes, really</figcaption></figure>
+            <figure class="plate"><picture><source type="image/webp" srcset="assets/06-multiplayer.webp"><img src="assets/06-multiplayer.png" alt="Fablerift party panel with two members and the party chat channel" width="1100" height="899" loading="lazy"></picture><figcaption>a party, and the chat that runs it</figcaption></figure>
+            <figure class="plate"><picture><source type="image/webp" srcset="assets/07-dungeon.webp"><img src="assets/07-dungeon.png" alt="Fablerift dungeon entrance, the Sunken Crypt at danger tier two" width="1100" height="899" loading="lazy"></picture><figcaption>the sunken crypt · danger tier 2</figcaption></figure>
           </div>
         </div>
         <div class="entry" style="margin-top:18px">
@@ -554,7 +558,8 @@ pr-guard: tests 68 · pass 68 · fail 0</div>
 </div>
 
 <div id="lightbox" role="dialog" aria-modal="true" aria-label="screenshot">
-  <img alt="" src="">
+  <!-- no src: an empty one resolves to this document and loads it as an image -->
+  <img alt="">
   <div class="lb-bar"><span id="lb-cap"></span><span id="lb-n" class="mono"></span></div>
 </div>
 
