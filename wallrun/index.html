@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wallrun — movement sandbox</title>
+<link rel="icon" href="../favicon.png">
+<meta name="description" content="A browser movement prototype: run, slide, wall-run, double jump. Momentum is the whole game.">
+<style>
+:root{--ink:#080c10;--gold:#d9a441;--cyan:#6fd3e0;--dim:#9aa7a0;--line:#233043}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(900px 500px at 70% -10%,#10202b,#080c10 60%);color:#e6e1d6;
+ font:15px/1.6 ui-sans-serif,system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+header{width:100%;max-width:1000px;padding:20px 18px 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+h1{font-size:22px;margin:0;letter-spacing:-.01em}
+h1 span{color:var(--gold)}
+.sub{color:var(--dim);font-size:13px}
+a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(111,211,224,.3)}
+a:hover{border-bottom-color:var(--cyan)}
+.back{margin-left:auto;font-size:13px;color:var(--dim);border:0}
+.back:hover{color:var(--gold)}
+#stage{position:relative;width:100%;max-width:1000px;padding:0 18px}
+canvas{display:block;width:100%;height:auto;background:#050a0e;border:1px solid var(--line);border-radius:6px;
+ box-shadow:0 22px 60px rgba(0,0,0,.55);image-rendering:auto;touch-action:none}
+#hud{position:absolute;top:30px;left:34px;right:34px;display:flex;gap:18px;font-size:11.5px;letter-spacing:.12em;
+ text-transform:uppercase;color:#7d8f86;pointer-events:none;flex-wrap:wrap}
+#hud b{color:var(--cyan);font-weight:600}
+#msg{position:absolute;top:50%;left:0;right:0;text-align:center;font-size:15px;letter-spacing:.16em;
+ text-transform:uppercase;color:var(--gold);pointer-events:none;text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.keys{width:100%;max-width:1000px;padding:14px 18px 30px;display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--dim)}
+kbd{background:#111c24;border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:2px 7px;
+ font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#cfe6d0}
+#touch{display:none;gap:10px;width:100%;max-width:1000px;padding:0 18px 22px}
+#touch button{flex:1;padding:16px 0;background:#101c25;color:#cfe6d0;border:1px solid var(--line);border-radius:5px;
+ font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+#touch button:active{background:rgba(217,164,65,.2);border-color:var(--gold)}
+@media(hover:none)and (pointer:coarse){#touch{display:flex}}
+@media(max-width:640px){#hud{font-size:10px;gap:10px;left:26px;right:26px;top:24px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>WALL<span>RUN</span></h1>
+  <p class="sub">movement sandbox · momentum, slides, wall-clings · no sprites, no engine</p>
+  <a class="back mono" href="../">← portfolio</a>
+</header>
+
+<div id="stage">
+  <canvas id="c" width="964" height="540"></canvas>
+  <div id="hud" class="mono">
+    <span>speed <b id="hSpeed">0</b></span>
+    <span>air <b id="hAir">0</b></span>
+    <span>checkpoint <b id="hCp">0/5</b></span>
+    <span>best <b id="hBest">—</b></span>
+  </div>
+  <div id="msg" class="mono">press → to run</div>
+</div>
+
+<div id="touch">
+  <button data-k="left">◀</button>
+  <button data-k="slide">slide</button>
+  <button data-k="jump">jump</button>
+  <button data-k="right">▶</button>
+</div>
+
+<div class="keys mono">
+  <span><kbd>←</kbd><kbd>→</kbd> run</span>
+  <span><kbd>Space</kbd>/<kbd>↑</kbd> jump · double jump</span>
+  <span><kbd>Shift</kbd> slide (builds speed)</span>
+  <span><kbd>↓</kbd> hold against a wall to run up it</span>
+  <span><kbd>R</kbd> restart</span>
+</div>
+
+<script>
+/* ------------------------------------------------------------------
+   Wallrun — a small 2D movement sandbox written from scratch.
+   Everything here is velocity + gravity + contact tests against axis
+   aligned boxes. The point of the prototype is the feel chain:
+   slide -> speed, speed -> jump arc, arc -> wall contact, contact ->
+   wall-run, wall-run -> wall jump. No asset files, no engine.
+------------------------------------------------------------------- */
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+const msg = document.getElementById('msg');
+const hud = {speed: document.getElementById('hSpeed'), air: document.getElementById('hAir'),
+             cp: document.getElementById('hCp'), best: document.getElementById('hBest')};
+
+// --- world: solid boxes [x,y,w,h], checkpoints, goal -----------------
+// Route climbs left to right then back: two floor pads, a wall-run up
+// wall A onto ledge 1, a wall-run up wall B onto ledge 2, then the top
+// run and the goal. Gaps are ~20px at the walls so a climb always has a
+// face to grab, and the one real gap (pad to pad) is 60px.
+const solids = [
+  [0, 500, 320, 40],        // start pad
+  [380, 500, 240, 40],      // second pad
+  [640, 390, 40, 150],      // wall A
+  [660, 330, 220, 22],      // ledge 1, runs up to wall B's face so there is no trap gap
+  [880, 170, 40, 180],      // wall B
+  [700, 210, 160, 22],      // ledge 2 - stops short of wall B so the climb lane stays clear
+  [500, 130, 190, 22],      // top run
+  [0, 0, W, 20], [0, 0, 20, H], [W-20, 0, 20, H]   // frame, open floor
+];
+// Only the two designed walls are climbable. The frame blocks you but does
+// not let you scale the arena, which stops the whole route being cheesed
+// by hugging the right edge.
+const CLIMB_IDX = [2, 4];
+// Checkpoints are tall planes standing on the surface, not small dots: a
+// player who jumps the 60px gap arrives in the air, so a ground-height
+// marker would be flown straight over. Each box is 60px tall with its base
+// on the platform, which catches both a run-through and a low arc.
+const cps = [
+  [150, 440, 44, 60],       // start pad
+  [540, 440, 44, 60],       // second pad, where a gap jump actually lands
+  [740, 270, 44, 60],       // ledge 1
+  [760, 150, 44, 60],       // ledge 2
+  [560, 70, 44, 60]         // top run
+];
+const goal = [600, 70, 26, 60];
+
+const P = {x: 60, y: 470, w: 15, h: 26, vx: 0, vy: 0, face: 1,
+           grounded: false, sliding: false, wall: 0, wallT: 0, climb: 0,
+           coyote: 0, buffer: 0, jumps: 2, cp: 0, dead: false};
+const G = 1500, MAXG = 340, AIR = 430, SLIDE_BOOST = 150, JUMP = 470, DJUMP = 400;
+const CLIMB_SPEED = 235, CLIMB_MAX = 0.72;
+let keys = {}, trail = [], best = null, t0 = performance.now(), clock = 0, done = false;
+
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const hit = (x, y, w, h) => solids.some(s => x < s[0]+s[2] && x+w > s[0] && y < s[1]+s[3] && y+h > s[1]);
+
+function reset(full) {
+  P.x = 60; P.y = 470; P.vx = 0; P.vy = 0; P.jumps = 2; P.sliding = false; P.wall = 0;
+  P.wallT = 0; P.climb = 0; P.coyote = 0; P.buffer = 0; P.dead = false;
+  if (full) { P.cp = 0; done = false; t0 = performance.now(); msg.textContent = 'press → to run'; }
+}
+
+function respawn() {
+  // Fell out of the world (or got wedged inside a solid) -> back onto the
+  // last checkpoint actually touched, not all the way to the start pad.
+  const c = P.cp > 0 ? cps[P.cp - 1] : cps[0];
+  P.x = c[0] + c[2]/2 - P.w/2; P.y = c[1] - P.h - 2; P.vx = 0; P.vy = 0; P.jumps = 2;
+  P.sliding = false; P.wall = 0; P.wallT = 0; P.climb = 0; P.coyote = 0; P.buffer = 0; P.dead = false;
+  msg.textContent = P.cp > 0 ? 'checkpoint ' + P.cp + ' · go' : 'press → to run';
+}
+
+function step(dt) {
+  if (P.dead) return;
+  const L = keys.left, R = keys.right, S = keys.slide, D = keys.down;
+
+  // --- horizontal intent --------------------------------------------
+  const accel = P.grounded ? (S ? 60 : 2100) : 1200;
+  const target = (R ? 1 : 0) - (L ? 1 : 0);
+  if (target !== 0) { P.face = target; P.vx += target * accel * dt; }
+  else if (P.grounded) { P.vx *= S && Math.abs(P.vx) > 90 ? 0.995 : Math.pow(0.0016, dt); }
+
+  // slide: low friction, small continuous boost, caps higher than run
+  const cap = P.sliding ? MAXG + SLIDE_BOOST : (P.grounded ? MAXG : AIR);
+  if (S && P.grounded && Math.abs(P.vx) > 120) { P.sliding = true; P.vx *= Math.pow(0.9, dt); }
+  if (!S || !P.grounded) P.sliding = false;
+  P.vx = clamp(P.vx, -(MAXG + SLIDE_BOOST), MAXG + SLIDE_BOOST);
+  if (Math.abs(P.vx) > cap && !P.sliding) P.vx = clamp(P.vx, -cap, cap);
+
+  // --- gravity + wall run -------------------------------------------
+  P.vy += G * dt;
+  const touchingWall = (P.wall = wallTest());
+  const climbing = climbTest() !== 0;
+  // Holding "down" against a wall in the air is the wall-run: it climbs
+  // instead of sliding, on a stamina clock, and it refills the air jump.
+  const canClimb = climbing && D && !P.grounded && P.climb < CLIMB_MAX;
+  if (canClimb) {
+    P.vy = -CLIMB_SPEED; P.climb += dt; P.wallT += dt; P.jumps = 1;
+    if (P.wallT > 0.08) puff(P.x + (P.wall < 0 ? P.w : 0), P.y + P.h * 0.7, -P.wall * 90, -40);
+  } else {
+    if (P.grounded || !touchingWall) P.climb = 0;
+    if (touchingWall && P.vy > 200) P.vy = 200;                 // plain wall slide
+    P.wallT = touchingWall && !P.grounded ? P.wallT + dt : 0;
+  }
+  P.vy = clamp(P.vy, -900, 900);
+
+  // --- integrate with per-axis contact tests ------------------------
+  let nx = P.x + P.vx * dt;
+  if (hit(nx, P.y, P.w, P.h)) { P.vx = 0; } else P.x = nx;
+  let ny = P.y + P.vy * dt;
+  if (hit(P.x, ny, P.w, P.h)) {
+    if (P.vy > 0) { P.grounded = true; P.jumps = 2; }
+    P.vy = 0;
+  } else { P.y = ny; P.grounded = hit(P.x, P.y + 1, P.w, 1); }
+  // Coyote time: a few frames of forgiveness after leaving a ledge, and a
+  // short buffer so a jump pressed just before landing still fires.
+  P.coyote = P.grounded ? 0.1 : Math.max(0, P.coyote - dt);
+  P.buffer = Math.max(0, P.buffer - dt);
+  if (P.buffer > 0 && (P.grounded || P.coyote > 0 || P.wall)) { P.buffer = 0; jump(); }
+
+  // checkpoints + goal
+  cps.forEach((c, i) => { if (i === P.cp && P.x < c[0]+c[2] && P.x+P.w > c[0] && P.y < c[1]+c[3] && P.y+P.h > c[1]) {
+    P.cp++; msg.textContent = 'checkpoint ' + P.cp + '/' + cps.length; puff(c[0]+c[2]/2, c[1], 0, -120); }});
+  if (!done && P.cp >= cps.length && P.x < goal[0]+goal[2] && P.x+P.w > goal[0] && P.y < goal[1]+goal[3] && P.y+P.h > goal[1]) {
+    done = true; const t = (performance.now() - t0) / 1000;
+    if (best === null || t < best) { best = t; msg.textContent = 'new best ' + t.toFixed(2) + 's'; }
+    else msg.textContent = 'out ' + t.toFixed(2) + 's · best ' + best.toFixed(2) + 's';
+    for (let i = 0; i < 40; i++) puff(P.x, P.y, (Math.random()-.5)*420, -Math.random()*380, '#d9a441');
+  }
+  // Wedged more than 2px inside a solid, or out of the world -> checkpoint.
+  if (P.y > H + 60 || hit(P.x + 2, P.y + 2, P.w - 4, P.h - 4)) { respawn(); }
+
+  // trail
+  if (Math.abs(P.vx) > 240 || P.sliding) trail.push({x: P.x, y: P.y, a: 1, s: P.sliding ? '#6fd3e0' : '#d9a441'});
+  trail.forEach(t => t.a -= dt * 2.4); trail = trail.filter(t => t.a > 0);
+}
+
+function wallTest() {
+  if (hit(P.x - 2, P.y, P.w, P.h)) return -1;
+  if (hit(P.x + 2, P.y, P.w, P.h)) return 1;
+  return 0;
+}
+
+// Same probe, but against CLIMB_IDX only: this is what "hold down" grabs.
+function climbTest() {
+  const cs = CLIMB_IDX.map(i => solids[i]);
+  const near = (px) => cs.some(s => px < s[0]+s[2] && px+P.w > s[0] && P.y < s[1]+s[3] && P.y+P.h > s[1]);
+  if (near(P.x - 3)) return -1;
+  if (near(P.x + 3)) return 1;
+  return 0;
+}
+
+function jump() {
+  if (P.dead) return;
+  const w = P.wall || wallTest();
+  const onWall = !P.grounded && w !== 0;
+  if (P.grounded || P.coyote > 0) {
+    P.vy = -JUMP; P.grounded = false; P.sliding = false; P.jumps = 1;
+    P.coyote = 0; P.climb = 0; puff(P.x + P.w/2, P.y + P.h, 0, 60);
+  } else if (onWall) {
+    // Wall jump: pushed away from the face you were running, which is what
+    // turns a climb into the next gap.
+    P.vy = -JUMP * 0.95; P.vx = -w * 320; P.face = -w; P.jumps = 1; P.wallT = 0; P.climb = 0;
+    puff(P.x + (w < 0 ? 0 : P.w), P.y + P.h/2, -w * 200, -60);
+  } else if (P.jumps > 0) {
+    P.vy = -DJUMP; P.jumps--; P.climb = 0; puff(P.x + P.w/2, P.y + P.h, 0, 40, '#6fd3e0');
+  } else {
+    P.buffer = 0.12;   // pressed too early: fire it when a surface arrives
+  }
+}
+
+function puff(x, y, vx, vy, col) {
+  for (let i = 0; i < 6; i++) trail.push({x, y, a: .9, s: col || '#5c7d8a',
+    dx: vx * (0.5 + Math.random()), dy: vy * (0.5 + Math.random())});
+}
+
+// --- drawing ---------------------------------------------------------
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  // parallax grid
+  ctx.strokeStyle = 'rgba(60,90,110,.16)'; ctx.lineWidth = 1;
+  const off = (P.x * 0.25) % 40;
+  for (let x = -off; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+  solids.forEach(s => {
+    ctx.fillStyle = '#16232e'; ctx.fillRect(s[0], s[1], s[2], s[3]);
+    ctx.strokeStyle = '#2e4a5c'; ctx.strokeRect(s[0]+.5, s[1]+.5, s[2]-1, s[3]-1);
+    ctx.fillStyle = 'rgba(111,211,224,.5)'; ctx.fillRect(s[0], s[1], s[2], 2);
+  });
+  cps.forEach((c, i) => {
+    const on = i < P.cp, cx = c[0] + c[2]/2, base = c[1] + c[3];
+    ctx.fillStyle = on ? '#d9a441' : '#3a4a52';
+    ctx.fillRect(cx-2, base - 30, 4, 30);
+    ctx.beginPath(); ctx.arc(cx, base - 34, on ? 5 : 3.5, 0, 7); ctx.fill();
+    if (on) { ctx.globalAlpha = .18; ctx.fillRect(c[0], c[1], c[2], c[3]); ctx.globalAlpha = 1; }
+  });
+  ctx.fillStyle = P.cp >= cps.length ? '#6fd3e0' : '#2a3a42';
+  ctx.fillRect(goal[0], goal[1], goal[2], goal[3]);
+
+  trail.forEach(t => { ctx.globalAlpha = Math.max(0, t.a); ctx.fillStyle = t.s;
+    ctx.fillRect(t.x - 1, t.y - 1, 4, 4); });
+  ctx.globalAlpha = 1;
+
+  // player: body + visor, drawn as blocks so it reads at any size
+  const bh = P.sliding ? P.h * 0.55 : P.h;
+  ctx.fillStyle = P.wallT > 0.05 ? '#6fd3e0' : '#e6e1d6';
+  ctx.fillRect(P.x, P.y + (P.h - bh), P.w, bh);
+  ctx.fillStyle = '#0a0e12';
+  ctx.fillRect(P.x + (P.face > 0 ? 7 : 2), P.y + (P.h - bh) + 4, 6, 3);
+  if (P.sliding) { ctx.fillStyle = 'rgba(111,211,224,.35)';
+    ctx.fillRect(P.x - P.face * 16, P.y + P.h - 6, 16, 4); }
+}
+
+function loop(now) {
+  const dt = Math.min(0.032, (now - (loop.prev || now)) / 1000); loop.prev = now;
+  step(dt); draw();
+  hud.speed.textContent = Math.abs(P.vx).toFixed(0);
+  hud.air.textContent = P.grounded ? '0' : (P.wall ? 'wall ' + Math.max(0, CLIMB_MAX - P.climb).toFixed(1) + 's' : P.jumps);
+  hud.cp.textContent = P.cp + '/' + cps.length;
+  hud.best.textContent = best === null ? '—' : best.toFixed(2) + 's';
+  requestAnimationFrame(loop);
+}
+
+// --- input ----------------------------------------------------------
+const map = {ArrowLeft:'left', KeyA:'left', ArrowRight:'right', KeyD:'right',
+             ArrowDown:'down', KeyS:'down', ShiftLeft:'slide', ShiftRight:'slide',
+             Space:'jump', ArrowUp:'jump', KeyW:'jump', KeyR:'reset'};
+addEventListener('keydown', e => {
+  const k = map[e.code]; if (!k) return; e.preventDefault();
+  if (k === 'jump') jump(); else if (k === 'reset') reset(true); else keys[k] = true;
+});
+addEventListener('keyup', e => { const k = map[e.code]; if (k) keys[k] = false; });
+document.querySelectorAll('#touch button').forEach(b => {
+  const k = b.dataset.k;
+  const on = e => { e.preventDefault(); k === 'jump' ? jump() : keys[k] = true; };
+  const off = e => { e.preventDefault(); keys[k] = false; };
+  b.addEventListener('touchstart', on); b.addEventListener('touchend', off);
+  b.addEventListener('mousedown', on); b.addEventListener('mouseup', off);
+});
+reset(true); requestAnimationFrame(loop);
+</script>
+</body>
+</html>
