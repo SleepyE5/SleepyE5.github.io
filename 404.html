@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0f1113">
+<meta name="robots" content="noindex">
+<title>404 — Enrico Sgiarovello</title>
+<meta name="description" content="Nothing at that address. The portfolio is one page; here is where everything lives.">
+<style>
+/* The same three faces and the same tokens as the homepage, kept small on
+   purpose: this page has one job and it should not cost a request, a build
+   step, or a scroll. */
+:root{
+  --bg:#0f1113; --bg2:#15181b; --bg3:#1b1f23;
+  --fg:#e8e6e1; --fg2:#b4b1aa; --fg3:#8f959b;
+  --line:#282d33; --line2:#3b4249;
+  --brass:#d9a441; --oxide:#63a58c;
+  --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  --sans:ui-sans-serif,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.65 var(--serif);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:26px 26px}
+.wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 26px}
+a{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--line2)}
+a:hover{border-bottom-color:var(--brass)}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px;border-radius:1px}
+
+.mast{padding:96px 0 0}
+.code{font:400 clamp(64px,11vw,104px)/1 var(--serif);letter-spacing:-.03em;
+  color:var(--fg3);margin:0}
+.code b{font-weight:700;color:var(--fg)}
+.line{display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;margin-top:20px}
+.job{font:600 12px/1.4 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+.says{font-size:21px;line-height:1.55;max-width:26em;color:var(--fg2);margin:26px 0 0}
+.says em{font-style:italic;color:var(--fg)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);margin:44px 0 0}
+.cell{background:var(--bg);padding:20px 22px 22px}
+.cell .h{font:600 10px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--brass);display:block;margin-bottom:12px}
+.cell ul{list-style:none;margin:0;padding:0;font:13px/1.5 var(--sans)}
+.cell li{margin:0 0 7px}
+.cell a{color:var(--fg2);border-bottom:0}
+.cell a:hover{color:var(--brass)}
+.cell p{margin:0;font:13px/1.6 var(--sans);color:var(--fg2)}
+
+.gone{margin:40px 0 0;padding:18px 20px;border:1px solid var(--line2);
+  border-left:3px solid var(--oxide);background:var(--bg2);
+  font:13px/1.65 var(--sans);color:var(--fg2);max-width:60em}
+.gone .k{display:block;font:600 10px/1 var(--mono);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--oxide);margin-bottom:9px}
+.gone code{font:12px/1.4 var(--mono);color:var(--fg);background:var(--bg3);
+  padding:1px 5px;border-radius:2px}
+
+footer{margin:64px 0 0;padding:28px 0 64px;border-top:1px solid var(--line);
+  font:12px/1.85 var(--sans);color:var(--fg3)}
+footer a{color:var(--fg2);border-bottom-color:var(--line2)}
+@media(max-width:600px){.mast{padding-top:64px}.says{font-size:19px}}
+@media(prefers-reduced-motion:no-preference){
+  html.js .fade{opacity:0;transform:translateY(12px);transition:opacity .5s,transform .5s}
+  html.js .fade.in{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+
+<div class="wrap">
+  <header class="mast">
+    <h1 class="code"><b>4</b>0<b>4</b></h1>
+    <div class="line">
+      <span class="job">nothing at that address</span>
+    </div>
+    <p class="says">The portfolio is <em>one page</em>, so there is not much to
+      be lost. Either the link is old or it was mistyped — both are fixable
+      from here.</p>
+  </header>
+
+  <div class="grid fade">
+    <div class="cell">
+      <span class="h">this page</span>
+      <ul>
+        <li><a href="/">everything, from the top →</a></li>
+        <li><a href="/#01">01 Fablerift</a></li>
+        <li><a href="/#02">02 linkcheck</a></li>
+        <li><a href="/#03">03 tinysite</a></li>
+        <li><a href="/#04">04 three more</a></li>
+        <li><a href="/#small">smaller things</a></li>
+      </ul>
+    </div>
+    <div class="cell">
+      <span class="h">the code</span>
+      <ul>
+        <li><a href="https://github.com/SleepyE5/linkcheck">linkcheck</a></li>
+        <li><a href="https://github.com/SleepyE5/tinysite">tinysite</a></li>
+        <li><a href="https://github.com/SleepyE5/uptime">uptime</a></li>
+        <li><a href="https://github.com/SleepyE5/pr-guard">pr-guard</a></li>
+        <li><a href="https://github.com/SleepyE5/slidelimit">slidelimit</a></li>
+      </ul>
+    </div>
+    <div class="cell">
+      <span class="h">play and talk</span>
+      <ul>
+        <li><a href="https://play.fablerift.net/">play fablerift in a browser</a></li>
+        <li><a href="https://fablerift.net/">the game's own site</a></li>
+        <li><a href="https://discord.gg/ecq88z7H9A">discord</a></li>
+        <li><a href="mailto:EnricoFJS@proton.me">EnricoFJS@proton.me</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <aside class="gone fade">
+    <span class="k">pages that used to be here</span>
+    <p><code>/wallrun/</code> was cut from the portfolio. <code>/roomsmith/</code>
+      and <code>/parser/</code> were removed because they were written for this
+      page rather than for anyone to use — they never had users, so they never
+      had a reason to stay. What replaced them is five repositories with their
+      own history, their own tests and their own CI, all of it readable in the
+      order it was committed.</p>
+  </aside>
+
+  <footer>
+    <div>
+      Enrico Sgiarovello · <a href="mailto:EnricoFJS@proton.me">EnricoFJS@proton.me</a> ·
+      <a href="https://github.com/SleepyE5">github.com/SleepyE5</a> ·
+      <a href="https://www.linkedin.com/in/enrico-sgiarovello/">linkedin</a>
+    </div>
+    <div style="margin-top:8px">
+      Same stylesheet's worth of CSS as the homepage, no framework, no build step.
+      If something here should have existed, say so and it will be fixed.
+    </div>
+  </footer>
+</div>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const marks = document.querySelectorAll('.fade');
+if (!reduce && 'IntersectionObserver' in window) {
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), {rootMargin: '0px 0px -10% 0px'});
+  marks.forEach(m => io.observe(m));
+} else marks.forEach(m => m.classList.add('in'));
+</script>
+</body>
+</html>
