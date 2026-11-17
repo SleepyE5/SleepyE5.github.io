@@ -72,6 +72,14 @@ h2{font:600 11px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;
 .mast .line{display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;margin-top:22px}
 .mast .job{font:600 12px/1.4 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
 .mast .upd{font:11px/1.4 var(--mono);color:var(--fg3);margin-left:auto}
+/* what the page is for, stated once, so nobody has to guess whether to ask */
+.mast .status{margin:20px 0 0;padding:12px 16px;border:1px solid var(--line2);
+  border-left:3px solid var(--brass);background:var(--bg2);max-width:52em;
+  display:flex;gap:14px;align-items:baseline;font:13px/1.6 var(--sans);color:var(--fg)}
+.mast .status .k{flex:none;font:600 10px/1 var(--mono);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--brass)}
+.mast .status p{margin:0}
+@media(max-width:780px){.mast .status{flex-direction:column;gap:8px;padding:12px 14px}}
 /* ch measures the digit zero, which is wider than running text: 60ch here was
    still 84 characters a line, so the measure is capped in em instead */
 .pitch{font-size:var(--s1);line-height:1.58;max-width:26em;margin:0;color:var(--fg2)}
@@ -221,6 +229,11 @@ html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
       <span class="job">solo developer · c# / .net · unity</span>
       <span class="upd mono">updated 18 nov 2026</span>
     </div>
+    <div class="status">
+      <span class="k">status</span>
+      <p>Open to game-dev or c#/.NET roles, and to contract work on someone else's
+        project. Fablerift always needs testers.</p>
+    </div>
     <div class="mast-body">
       <p class="pitch">I write the server, the clients, the launcher and the installer, then put a
         download page at the end of it. <em>Fablerift</em> is the proof: a MUD you can start playing in
@@ -245,6 +258,7 @@ html.js .reveal.in .plates .plate:nth-child(3){transition-delay:.2s}
       <a href="#01">what I built</a>
       <a href="#small">small things</a>
       <a href="https://github.com/SleepyE5">github</a>
+      <a href="https://www.linkedin.com/in/enrico-sgiarovello/">linkedin</a>
       <a href="mailto:EnricoFJS@proton.me">email me</a>
     </div>
   </header>
@@ -507,6 +521,7 @@ pr-guard: tests 68 · pass 68 · fail 0</div>
     <div>
       Enrico Sgiarovello · <a href="mailto:EnricoFJS@proton.me">EnricoFJS@proton.me</a> ·
       <a href="https://github.com/SleepyE5">github.com/SleepyE5</a> ·
+      <a href="https://www.linkedin.com/in/enrico-sgiarovello/">linkedin</a> ·
       <a href="https://discord.gg/ecq88z7H9A">discord</a> ·
       <a href="https://play.fablerift.net/">play.fablerift.net</a>
     </div>
