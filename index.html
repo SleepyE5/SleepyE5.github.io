@@ -268,8 +268,8 @@ html.js .reveal.in .plates .plate:nth-child(5){transition-delay:.4s}
       </nav>
     </div>
     <dl class="rail">
-      <div><dt>v1.5.1</dt><dd>released 15 nov 2026</dd></div>
-      <div><dt>441</dt><dd>commits, all mine</dd></div>
+      <div><dt>v1.5.3</dt><dd>released 17 nov 2026</dd></div>
+      <div><dt>450</dt><dd>commits, all mine</dd></div>
       <div><dt>243</dt><dd>hand-written rooms</dd></div>
       <div><dt>10</dt><dd>regions to walk</dd></div>
     </dl>
@@ -290,7 +290,7 @@ html.js .reveal.in .plates .plate:nth-child(5){transition-delay:.4s}
       <div class="num">01</div>
       <div>
         <h3><b>Fablerift</b> — text RPG, browser + Telnet + SSH</h3>
-        <p class="meta">C# · net9.0 · MIT<br><i>v1.5.1, released 15 nov 2026</i> · 441 commits, all mine</p>
+        <p class="meta">C# · net9.0 · MIT<br><i>v1.5.3, released 17 nov 2026</i> · 450 commits, all mine</p>
         <div class="body">
           <div>
             <p>A MUD, written from the socket up. Players type commands and walk a world that ten of
@@ -384,7 +384,7 @@ html.js .reveal.in .plates .plate:nth-child(5){transition-delay:.4s}
       <div class="num">03</div>
       <div>
         <h3><b>tinysite</b> — a static site generator small enough to read end to end</h3>
-        <p class="meta">c# · net10.0 global tool · MIT<br><i>12 commits · 283 tests · no packages at all</i></p>
+        <p class="meta">c# · net10.0 global tool · MIT<br><i>15 commits · 284 tests · no packages at all</i></p>
         <div class="body">
           <div>
             <p>Markdown plus one HTML template in; a site with pages, an archive, tag pages and an RSS
@@ -450,16 +450,22 @@ tinysite: 2 problems in the source; nothing was published.</div>
                 file is the uptime history. When a target goes down it opens its own GitHub issue. It
                 comments on a cadence rather than every five minutes, because an outage that repeats
                 itself a hundred times overnight is an outage you will have muted by morning — and it
-                speaks immediately when the failure <i>changes</i>. 18 commits, 109 tests, and the three
+                speaks immediately when the failure <i>changes</i>. 26 commits, 110 tests, and the three
                 targets it is pointed at are this site, its own HTTP-to-HTTPS upgrade, and GitHub's
-                status API.</li>
+                status API. One thing it does not do yet: <b>the cron has never fired here.</b> GitHub
+                leaves <span class="mono">next_run_at</span> null on this account's only schedule while
+                reporting the workflow active, and a push, a disable/enable pair and a rename that
+                created a fresh workflow entity all failed to change that — so every committed run in
+                that repository came from a manual dispatch. The README says the same thing before it
+                shows you the table.</li>
               <li><a href="https://github.com/SleepyE5/pr-guard"><b>pr-guard</b></a> — a GitHub Action
                 with three checkable rules: source changed with no test changed, a file over the line
                 budget, a commit called <span class="mono">fixed stuff</span>. It does not pretend to
                 judge whether your tests are any good, and says so in the README. Bundled to a single
                 <span class="mono">dist/index.js</span> so consuming it needs no install; its own
                 dependencies are the official Actions toolkit and <span class="mono">minimatch</span>,
-                nothing more. 15 commits, 68 tests, and it reviews its own pull requests.</li>
+                nothing more. 16 commits, 68 tests on Node 20, 22 and 24, and it ships wired to review
+                this repository's own pull requests.</li>
               <li><a href="https://github.com/SleepyE5/slidelimit"><b>slidelimit</b></a> — sliding-window
                 and token-bucket rate limiting behind one interface, with pluggable storage and every
                 clock read going through an injected <span class="mono">TimeProvider</span>, which is
